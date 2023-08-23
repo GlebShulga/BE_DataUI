@@ -24,7 +24,6 @@ function getCurrentUnixTime() {
 function main() {
   const refreshRate = 100;
   const logFilePath = "activityMonitor.log";
-  //   const logInterval = 60 * 1000;
 
   try {
     let lastLogTime = 0;
