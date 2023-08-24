@@ -28,29 +28,27 @@ function main() {
   const logFilePath = "activityMonitor.log";
   let topProcessCommand;
   try {
-    (async () => {
-      let lastLogTime = 0;
-      topProcessCommand = getTopProcessCommand();
-      setInterval(() => {
-        exec(topProcessCommand, (error, stdout) => {
-          if (error) {
-            console.error(error);
-            return;
-          }
+    let lastLogTime = 0;
+    topProcessCommand = getTopProcessCommand();
+    setInterval(() => {
+      exec(topProcessCommand, (error, stdout) => {
+        if (error) {
+          console.error(error);
+          return;
+        }
 
-          const processInfo = stdout.trim();
-          const currentTime = getCurrentUnixTime();
-          const logMessage = `${currentTime} : ${processInfo}`;
+        const processInfo = stdout.trim();
+        const currentTime = getCurrentUnixTime();
+        const logMessage = `${currentTime} : ${processInfo}`;
 
-          process.stdout.write(`\r${processInfo}`);
+        process.stdout.write(`\r${processInfo}`);
 
-          if (currentTime - lastLogTime >= 60) {
-            logToFile(logFilePath, `${logMessage}`);
-            lastLogTime = currentTime;
-          }
-        });
-      }, refreshRate);
-    })();
+        if (currentTime - lastLogTime >= 60) {
+          logToFile(logFilePath, `${logMessage}`);
+          lastLogTime = currentTime;
+        }
+      });
+    }, refreshRate);
   } catch (error) {
     console.error(error);
   }
