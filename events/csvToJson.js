@@ -7,21 +7,25 @@ const txtFilePath = path.join(__dirname, "output.txt");
 
 const csvToJson = async () => {
   try {
-    const readStream = fs.createReadStream(csvFilePath, "utf-8");
     const writeStream = fs.createWriteStream(txtFilePath, { flags: "a" });
 
-    const jsonArray = await csv().fromStream(readStream);
-
-    jsonArray.forEach((data) => {
-      const { Book, Author, Price } = data;
-      const jsonObject = {
-        book: Book,
-        author: Author,
-        price: parseFloat(Price),
-      };
-      const jsonString = JSON.stringify(jsonObject) + "\n";
-      writeStream.write(jsonString);
-    });
+    await csv({
+      noheader: true,
+      headers: ["Book", "Author", "Amount", "Price"],
+    })
+      .fromFile(csvFilePath)
+      .subscribe((json, lineNumber) => {
+        if (lineNumber > 0) {
+          const { Book, Author, Price } = json;
+          const jsonObject = {
+            book: Book,
+            author: Author,
+            price: parseFloat(Price),
+          };
+          const jsonString = JSON.stringify(jsonObject) + "\n";
+          writeStream.write(jsonString);
+        }
+      });
 
     console.log("CSV to JSON conversion completed.");
 
