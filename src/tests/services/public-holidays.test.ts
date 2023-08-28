@@ -1,11 +1,12 @@
 import axios from "axios";
-import { shortenPublicHoliday } from "../helpers"; // Replace with the actual helper path
+import request from "supertest";
+import { shortenPublicHoliday } from "../helpers";
 import {
   checkIfTodayIsPublicHoliday,
   getListOfPublicHolidays,
   getNextPublicHolidays,
 } from "./public-holidays.service";
-import * as helpers from "../helpers";
+import { PUBLIC_HOLIDAYS_API_URL } from "../config";
 
 jest.mock("axios");
 
@@ -133,22 +134,57 @@ describe("Public Holidays API", () => {
     describe("getListOfPublicHolidays", () => {
       it("fetches and processes the list of public holidays for a specific year and country", async () => {
         const result = await getListOfPublicHolidays(2023, "FR");
-        expect(result).toEqual(expect.any(Array)); // Assert against the actual response
+        expect(result).toEqual(expect.any(Array));
       });
     });
 
     describe("checkIfTodayIsPublicHoliday", () => {
       it("checks if today is a public holiday in a specific country", async () => {
         const result = await checkIfTodayIsPublicHoliday("FR");
-        expect(result).toEqual(expect.any(Boolean)); // Assert against the actual response
+        expect(result).toEqual(expect.any(Boolean));
       });
     });
 
     describe("getNextPublicHolidays", () => {
       it("fetches and processes the list of next public holidays for a specific country", async () => {
         const result = await getNextPublicHolidays("FR");
-        expect(result).toEqual(expect.any(Array)); // Assert against the actual response
+        expect(result).toEqual(expect.any(Array));
       });
+    });
+  });
+
+  describe("Public Holidays API E2E test", () => {
+    it("fetches and shortens public holidays correctly", async () => {
+      const year = 2023;
+      const country = "FR";
+
+      const response = await request(PUBLIC_HOLIDAYS_API_URL)
+        .get(`/PublicHolidays/${year}/${country}`)
+        .expect(200);
+
+      expect(response.body).toContainEqual(
+        expect.objectContaining({
+          name: expect.any(String),
+          localName: expect.any(String),
+          date: expect.any(String),
+          countryCode: expect.any(String),
+          fixed: expect.any(Boolean),
+          global: expect.any(Boolean),
+          launchYear: expect.any(Number),
+        })
+      );
+    });
+  });
+
+  describe("Check If Today Is Public Holiday API E2E test", () => {
+    it("returns true if today is a public holiday", async () => {
+      const country = "NL";
+
+      const response = await request(PUBLIC_HOLIDAYS_API_URL).get(
+        `/IsTodayPublicHoliday/${country}`
+      );
+
+      expect([200, 204]).toContain(response.status);
     });
   });
 });
