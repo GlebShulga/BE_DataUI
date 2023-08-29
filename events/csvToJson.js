@@ -14,7 +14,7 @@ const csvToJson = async () => {
       headers: ["Book", "Author", "Amount", "Price"],
     })
       .fromFile(csvFilePath)
-      .subscribe((json, lineNumber) => {
+      .subscribe(async (json, lineNumber) => {
         if (lineNumber > 0) {
           const { Book, Author, Price } = json;
           const jsonObject = {
@@ -23,7 +23,14 @@ const csvToJson = async () => {
             price: parseFloat(Price),
           };
           const jsonString = JSON.stringify(jsonObject) + "\n";
-          writeStream.write(jsonString);
+          await new Promise((resolve, reject) => {
+            writeStream.write(jsonString, (error) => {
+              if (error) {
+                return reject(error);
+              }
+              resolve();
+            });
+          });
         }
       });
 
