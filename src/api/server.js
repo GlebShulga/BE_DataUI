@@ -14,8 +14,17 @@ const server = http.createServer((req, res) => {
   const { pathname } = parse(req.url, true);
   const method = req.method.toUpperCase();
 
-  // Handle routes
-  if (pathname === "/users") {
+  const matchRoute = (path, callback) => {
+    const regex = new RegExp(`^${path.replace(/:\w+/g, "(\\d+)")}$`);
+
+    if (regex.test(pathname)) {
+      const match = pathname.match(regex);
+      const userId = match && match[1];
+      callback(userId);
+    }
+  };
+
+  matchRoute("/users", () => {
     if (method === "GET") {
       const users = getUsers();
       res.writeHead(200, { "Content-Type": "application/json" });
@@ -32,16 +41,17 @@ const server = http.createServer((req, res) => {
         res.end(JSON.stringify(newUser));
       });
     }
-  } else if (pathname.startsWith("/users/") && !pathname.endsWith("/hobbies")) {
-    const userId = parseInt(pathname.split("/")[2]);
+  });
 
+  matchRoute("/users/:userId", (id) => {
+    const userId = parseInt(id);
     if (!isNaN(userId)) {
       if (method === "GET") {
         const hobbies = getUserHobbies(userId);
         if (hobbies !== null) {
           const hobbiesWithLinks = {
             hobbies,
-            links: [{ rel: "self", href: `/users/${userId}/hobbies` }],
+            links: [{ rel: "self", href: `/users/${userId}`, method: "GET" }],
           };
           res.writeHead(200, {
             "Content-Type": "application/json",
@@ -82,11 +92,13 @@ const server = http.createServer((req, res) => {
       res.writeHead(400);
       res.end();
     }
-  } else if (pathname.startsWith("/users/") && pathname.endsWith("/hobbies")) {
-    const userId = parseInt(pathname.split("/")[2]);
+  });
+
+  matchRoute("/users/:userId/hobbies", (id) => {
+    const userId = parseInt(id);
 
     if (!isNaN(userId)) {
-      if (method === "PATCH") {
+      if (method === "POST") {
         let body = "";
         req.on("data", (chunk) => {
           body += chunk.toString();
@@ -97,7 +109,13 @@ const server = http.createServer((req, res) => {
           if (updatedHobbies) {
             const hobbiesWithLinks = {
               hobbies: updatedHobbies,
-              links: [{ rel: "self", href: `/users/${userId}/hobbies` }],
+              links: [
+                {
+                  rel: "self",
+                  href: `/users/${userId}/hobbies`,
+                  method: "POST",
+                },
+              ],
             };
             res.writeHead(200, { "Content-Type": "application/json" });
             res.end(JSON.stringify(hobbiesWithLinks));
@@ -115,12 +133,8 @@ const server = http.createServer((req, res) => {
           const hobby = JSON.parse(body);
           const updatedHobbies = deleteUserHobby(userId, hobby);
           if (updatedHobbies) {
-            const hobbiesWithLinks = {
-              hobbies: updatedHobbies,
-              links: [{ rel: "self", href: `/users/${userId}/hobbies` }],
-            };
-            res.writeHead(200, { "Content-Type": "application/json" });
-            res.end(JSON.stringify(hobbiesWithLinks));
+            res.writeHead(204);
+            res.end();
           } else {
             res.writeHead(404);
             res.end();
@@ -131,10 +145,7 @@ const server = http.createServer((req, res) => {
       res.writeHead(400);
       res.end();
     }
-  } else {
-    res.writeHead(404);
-    res.end();
-  }
+  });
 });
 
 const PORT = process.env.PORT || 3000;
