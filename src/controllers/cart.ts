@@ -1,4 +1,3 @@
-// controllers/cartController.ts
 import { Request, Response } from "express";
 import {
   createUserCart,
