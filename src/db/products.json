@@ -1,0 +1,20 @@
+[
+  {
+    "id": "51422fcd-0366-4186-ad5b-c23059b6f64f",
+    "title": "Book",
+    "description": "A very interesting book",
+    "price": 27
+  },
+  {
+    "id": "001-101",
+    "title": "book",
+    "description": "book description",
+    "price": 12
+  },
+  {
+    "id": "007-707",
+    "title": "Cool staff",
+    "description": "Cool staff description",
+    "price": 70
+  }
+]

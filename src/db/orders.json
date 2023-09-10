@@ -1,0 +1,38 @@
+[
+  {
+    "id": "5bd1e704-e74c-43fc-9e64-8774f8a0a76d",
+    "userId": "0fe36d16-49bc-4aab-a227-f84df899a6cb",
+    "cartId": "1434fec6-cd85-420d-95c0-eee2301a971d",
+    "items": [
+      {
+        "product": {
+          "id": "007-707",
+          "title": "Cool staff",
+          "description": "Cool staff description",
+          "price": 70
+        },
+        "count": 3
+      },
+      {
+        "product": {
+          "id": "001-101",
+          "title": "book",
+          "description": "book description",
+          "price": 12
+        },
+        "count": 2
+      }
+    ],
+    "payment": {
+      "type": "paypal",
+      "address": "London",
+      "creditCard": "1234-1234-1234-1234"
+    },
+    "delivery": {
+      "type": "post",
+      "address": "London"
+    },
+    "status": "created",
+    "totalPrice": 234
+  }
+]
