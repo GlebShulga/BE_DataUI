@@ -36,10 +36,8 @@ export async function getCart(req: Request, res: Response) {
   try {
     const userId = ((req as any).user as User).id;
 
-    // Use the service function to get the user's cart
     const cart = await getUserCart(userId);
 
-    // Calculate total price here based on cart items
     const totalPrice = cart.items.reduce(
       (total, item) => total + item.product.price * item.count,
       0
@@ -112,5 +110,3 @@ export async function deleteCart(req: Request, res: Response) {
     });
   }
 }
-
-// Other cart-related controllers...

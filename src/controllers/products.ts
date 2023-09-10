@@ -1,4 +1,3 @@
-// controllers/productController.ts
 import { Request, Response } from "express";
 import { getProduct } from "../services/product";
 import {
@@ -51,5 +50,3 @@ export async function getProductById(req: Request, res: Response) {
     });
   }
 }
-
-// Other product-related controllers...
