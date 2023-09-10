@@ -11,13 +11,12 @@ import { Cart } from "../types/types";
 export async function createUserCart(userId: string): Promise<Cart> {
   try {
     const cartId = uuidv4();
-    // Read the existing carts data from the file
+
     const cartData = await readFile(CARTS_FILE_PATH, "utf8");
     const allCarts: Cart[] = JSON.parse(cartData);
 
     const userCartIndex = allCarts.findIndex((cart) => cart.userId === userId);
-    console.log("userCartIndex", userCartIndex);
-    // Check if a cart already exists for the user
+
     if (userCartIndex === -1) {
       const newCart: Cart = {
         id: cartId,
