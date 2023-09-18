@@ -15,7 +15,9 @@ export async function createUserCart(userId: string): Promise<Cart> {
     const cartData = await readFile(CARTS_FILE_PATH, "utf8");
     const allCarts: Cart[] = JSON.parse(cartData);
 
-    const userCartIndex = allCarts.findIndex((cart) => cart.userId === userId);
+    const userCartIndex = allCarts.findIndex(
+      (cart) => cart.userId === userId && !cart.isDeleted
+    );
 
     if (userCartIndex === -1) {
       const newCart: Cart = {
@@ -46,7 +48,9 @@ export async function getUserCart(userId: string): Promise<Cart> {
     const cartData = await readFile(CARTS_FILE_PATH, "utf8");
     const carts: Cart[] = JSON.parse(cartData);
 
-    const userCart = carts.find((cart) => cart.userId === userId);
+    const userCart = carts.find(
+      (cart) => cart.userId === userId && !cart.isDeleted
+    );
 
     if (userCart) {
       return userCart;
@@ -82,7 +86,9 @@ export async function updateUserCart(
     const cartData = await readFile(CARTS_FILE_PATH, "utf8");
     const carts: Cart[] = JSON.parse(cartData);
 
-    const userCartIndex = carts.findIndex((cart) => cart.userId === userId);
+    const userCartIndex = carts.findIndex(
+      (cart) => cart.userId === userId && !cart.isDeleted
+    );
 
     if (userCartIndex !== -1) {
       carts[userCartIndex].items = updatedCart.items;
@@ -115,7 +121,9 @@ export async function deleteUserCart(userId: string): Promise<void> {
     const cartData = await readFile(CARTS_FILE_PATH, "utf8");
     const carts: Cart[] = JSON.parse(cartData);
 
-    const userCartIndex = carts.findIndex((cart) => cart.userId === userId);
+    const userCartIndex = carts.findIndex(
+      (cart) => cart.userId === userId && !cart.isDeleted
+    );
 
     if (userCartIndex !== -1) {
       carts[userCartIndex].isDeleted = true;
