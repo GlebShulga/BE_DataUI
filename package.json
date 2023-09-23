@@ -4,8 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "tsc && node dist/server",
-    "start:dev": "tsc-watch --onSuccess \"node dist/server\"",
     "task1": "nodemon events/eventEmitter.js",
     "task2": "nodemon events/withTime.js",
     "task3": "nodemon events/csvToJson.js",
