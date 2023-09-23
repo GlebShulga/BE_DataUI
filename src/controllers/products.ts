@@ -1,13 +1,15 @@
 import { Request, Response } from "express";
-import { getProduct } from "../services/product";
 import {
   RESPONSE_CODE_OK,
   RESPONSE_CODE_SERVER_ERROR,
 } from "../constants/responseCodes";
+import { Product } from "../entities/Product";
 
 export async function getProductsList(req: Request, res: Response) {
   try {
-    const productList = await getProduct();
+    const em = (req as any).orm.em.fork();
+
+    const productList = await em.find(Product, {});
 
     res.status(RESPONSE_CODE_OK).json({
       data: productList,
@@ -27,7 +29,9 @@ export async function getProductsList(req: Request, res: Response) {
 export async function getProductById(req: Request, res: Response) {
   try {
     const productId = req.params.productId;
-    const product = await getProduct(productId);
+    const em = (req as any).orm.em.fork();
+
+    const product = await em.findOne(Product, { id: productId });
 
     if (!product) {
       return res.status(404).json({

@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import { USERS_FILE_PATH } from "../constants/filePaths";
-import { readFile } from "fs/promises";
-import { RESPONSE_CODE_SERVER_ERROR } from "../constants/responseCodes";
+import {
+  RESPONSE_CODE_SERVER_ERROR,
+  RESPONSE_CODE_UNAUTHORIZED,
+} from "../constants/responseCodes";
+import { User } from "../entities";
 
 async function authenticateUser(
   req: Request,
@@ -19,13 +21,11 @@ async function authenticateUser(
       });
     }
 
-    const usersData = await readFile(USERS_FILE_PATH, "utf8");
-    const users = JSON.parse(usersData);
+    const em = (req as any).orm.em.fork();
+    const user = await em.findOne(User, { id: userId });
 
-    const foundUser = users.find((user: { id: string }) => user.id === userId);
-
-    if (!foundUser) {
-      return res.status(401).json({
+    if (!user) {
+      return res.status(RESPONSE_CODE_UNAUTHORIZED).json({
         data: null,
         error: {
           message: "No user with such id",
@@ -33,7 +33,7 @@ async function authenticateUser(
       });
     }
 
-    (req as any).user = foundUser;
+    (req as any).user = user;
     next();
   } catch (error) {
     console.error("Error authenticating user:", error);
