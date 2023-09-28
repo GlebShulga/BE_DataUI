@@ -1,7 +1,5 @@
 {
-  "namespaces": [
-    "public"
-  ],
+  "namespaces": ["public"],
   "name": "public",
   "tables": [
     {
@@ -49,9 +47,7 @@
       "indexes": [
         {
           "keyName": "carts_pkey",
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "primary": true,
           "unique": true
@@ -104,9 +100,7 @@
       "indexes": [
         {
           "keyName": "products_pkey",
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "primary": true,
           "unique": true
@@ -143,55 +137,21 @@
           "primary": false,
           "nullable": false,
           "mappedType": "string"
-        },
-        "cart_id": {
-          "name": "cart_id",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "string"
         }
       },
       "name": "users",
       "schema": "public",
       "indexes": [
         {
-          "columnNames": [
-            "cart_id"
-          ],
-          "composite": false,
-          "keyName": "users_cart_id_unique",
-          "primary": false,
-          "unique": true
-        },
-        {
           "keyName": "users_pkey",
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "primary": true,
           "unique": true
         }
       ],
       "checks": [],
-      "foreignKeys": {
-        "users_cart_id_foreign": {
-          "constraintName": "users_cart_id_foreign",
-          "columnNames": [
-            "cart_id"
-          ],
-          "localTableName": "public.users",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.carts",
-          "deleteRule": "set null",
-          "updateRule": "cascade"
-        }
-      }
+      "foreignKeys": {}
     },
     {
       "columns": {
@@ -282,9 +242,7 @@
       "indexes": [
         {
           "keyName": "orders_pkey",
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "primary": true,
           "unique": true
@@ -294,13 +252,9 @@
       "foreignKeys": {
         "orders_user_id_foreign": {
           "constraintName": "orders_user_id_foreign",
-          "columnNames": [
-            "user_id"
-          ],
+          "columnNames": ["user_id"],
           "localTableName": "public.orders",
-          "referencedColumnNames": [
-            "id"
-          ],
+          "referencedColumnNames": ["id"],
           "referencedTableName": "public.users",
           "updateRule": "cascade"
         }
