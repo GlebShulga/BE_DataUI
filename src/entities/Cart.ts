@@ -1,6 +1,6 @@
 import { Entity, ManyToOne, PrimaryKey, Property } from "@mikro-orm/core";
 import { v4 as uuidv4 } from "uuid";
-import { CartItem } from "../types/types";
+import { CartItemType } from "../types/types";
 import { User } from "./User";
 import { Product } from "./Product";
 
@@ -13,7 +13,7 @@ export class Cart {
   isDeleted: boolean = false;
 
   @Property({ type: "jsonb" })
-  items: CartItem[] = [];
+  items: CartItemType[] = [];
 
   @ManyToOne(() => User)
   user!: User;

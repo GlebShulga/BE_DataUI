@@ -1,5 +1,6 @@
 import { Request } from "express";
 import { EntityManager } from "@mikro-orm/core";
+import { ObjectId } from "mongoose";
 
 export interface User {
   id: string;
@@ -7,20 +8,20 @@ export interface User {
   email: string;
 }
 
-export interface CartItem {
-  product: Product;
+export interface CartItemType {
+  product: ProductType;
   count: number;
 }
 
-export interface Cart {
-  id: string; // uuid
-  userId: string;
+export interface CartType {
+  _id: ObjectId;
+  user: ObjectId;
   isDeleted: boolean;
-  items: CartItem[];
+  items: CartItemType[];
 }
 
-export interface Product {
-  id: string;
+export interface ProductType {
+  _id: ObjectId;
   title: string;
   description: string;
   price: number;
@@ -30,7 +31,7 @@ export interface Order {
   id: string;
   userId: string;
   cartId: string;
-  items: CartItem[];
+  items: CartItemType[];
   payment: {
     type: string;
     address: string;

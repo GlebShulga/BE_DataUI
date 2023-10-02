@@ -3,7 +3,7 @@ import {
   RESPONSE_CODE_SERVER_ERROR,
   RESPONSE_CODE_UNAUTHORIZED,
 } from "../constants/responseCodes";
-import { User } from "../entities";
+import { User } from "../models";
 
 async function authenticateUser(
   req: Request,
@@ -21,8 +21,7 @@ async function authenticateUser(
       });
     }
 
-    const em = (req as any).orm.em.fork();
-    const user = await em.findOne(User, { id: userId });
+    const user = await User.findOne({ _id: userId }).exec();
 
     if (!user) {
       return res.status(RESPONSE_CODE_UNAUTHORIZED).json({

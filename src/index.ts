@@ -1,8 +1,7 @@
 import * as dotenv from "dotenv";
 import express from "express";
 import bodyParser from "body-parser";
-import { MikroORM } from "@mikro-orm/core";
-import { PostgreSqlDriver } from "@mikro-orm/postgresql";
+import mongoose from "mongoose";
 import {
   createCart,
   deleteCart,
@@ -11,21 +10,23 @@ import {
   checkoutOrder,
   getProductById,
   getProductsList,
-} from "../controllers";
-import { authenticateUser } from "../auth";
-import config from "../config/orm.config";
+} from "./controllers";
+import { authenticateUser } from "./auth";
 
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
 async function main() {
-  const orm = await MikroORM.init<PostgreSqlDriver>(config);
+  const uri = process.env.MONGODB_URI || "mongodb://localhost:27017/nodejs";
 
-  app.use((req, res, next) => {
-    (req as any).orm = orm;
-    next();
-  });
+  const options = {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    heartbeatFrequencyMS: 1000,
+  };
+
+  await mongoose.connect(uri, options);
 
   app.use(bodyParser.json());
 

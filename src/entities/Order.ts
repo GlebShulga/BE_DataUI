@@ -1,6 +1,6 @@
 import { Entity, ManyToOne, PrimaryKey, Property } from "@mikro-orm/core";
 import { v4 as uuidv4 } from "uuid";
-import { CartItem } from "../types/types";
+import { CartItemType } from "../types/types";
 import { User } from "./User";
 
 @Entity({ tableName: "orders" })
@@ -15,7 +15,7 @@ export class Order {
   cartId: string;
 
   @Property({ type: "json" })
-  items: CartItem[];
+  items: CartItemType[];
 
   @Property({ type: "json" })
   payment: {
@@ -42,7 +42,7 @@ export class Order {
   constructor(
     user: User,
     cartId: string,
-    items: CartItem[],
+    items: CartItemType[],
     payment: {
       type: string;
       address: string;
