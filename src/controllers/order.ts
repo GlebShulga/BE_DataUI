@@ -5,7 +5,7 @@ import {
   RESPONSE_CODE_SERVER_ERROR,
 } from "../constants/responseCodes";
 import { getUserCart } from "../services/cart";
-import { Order } from "../models";
+import { createOrder } from "../services/order";
 
 export async function checkoutOrder(req: Request, res: Response) {
   const userId = (req as any).user.id;
@@ -19,20 +19,22 @@ export async function checkoutOrder(req: Request, res: Response) {
   }
 
   try {
-    const newOrder = new Order({
-      user: userId,
-      cartId: userCart._id,
-      items: userCart.items,
-      payment: {
-        type: "credit card", // all hardcoded fields should be taken from the FE request
-        address: "123 Main St",
-        creditCard: "1234-5678-9012-3456",
-      },
-      delivery: { type: "standard", address: "123 Main St" },
-      status: "pending",
-      totalPrice: 0,
-    });
-    await newOrder.save();
+    const {
+      paymentType,
+      paymentAddress,
+      paymentCreditCard,
+      deliveryType,
+      deliveryAddress,
+    } = req.body;
+    const newOrder = await createOrder(
+      userId,
+      userCart,
+      paymentType,
+      paymentAddress,
+      paymentCreditCard,
+      deliveryType,
+      deliveryAddress
+    );
 
     res.status(RESPONSE_CODE_OK).json({
       data: { order: newOrder },
