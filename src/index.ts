@@ -11,7 +11,17 @@ import {
   getProductById,
   getProductsList,
 } from "./controllers";
-import { authenticateUser } from "./auth";
+import { authenticateUser, CurrentUser } from "./auth";
+import { userLogin, userRegistration } from "./controllers/user";
+import { isAdmin } from "./middleware/isAdmin";
+
+declare global {
+  namespace Express {
+    interface Request {
+      user: CurrentUser;
+    }
+  }
+}
 
 dotenv.config();
 const app = express();
@@ -30,26 +40,34 @@ async function main() {
 
   app.use(bodyParser.json());
 
+  // Create user
+  app.post("/api/register", userRegistration);
+
+  // Login user
+  app.post("/api/login", userLogin);
+
+  app.use("/api", authenticateUser);
+
   // Create user cart
-  app.post("/api/profile/cart", authenticateUser, createCart);
+  app.post("/api/profile/cart", createCart);
 
   // Get user cart
-  app.get("/api/profile/cart", authenticateUser, getCart);
+  app.get("/api/profile/cart", getCart);
 
   // Update user cart
-  app.put("/api/profile/cart", authenticateUser, updateCart);
+  app.put("/api/profile/cart", updateCart);
 
   // Empty user cart
-  app.delete("/api/profile/cart", authenticateUser, deleteCart);
+  app.delete("/api/profile/cart", isAdmin, deleteCart);
 
   // Create an order
-  app.post("/api/profile/cart/checkout", authenticateUser, checkoutOrder);
+  app.post("/api/profile/cart/checkout", checkoutOrder);
 
   // Returns a list of products
-  app.get("/api/products", authenticateUser, getProductsList);
+  app.get("/api/products", getProductsList);
 
   // Returns a single product
-  app.get("/api/products/:productId", authenticateUser, getProductById);
+  app.get("/api/products/:productId", getProductById);
 
   app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

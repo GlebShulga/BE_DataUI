@@ -1,49 +1,37 @@
+import * as jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
-import {
-  RESPONSE_CODE_SERVER_ERROR,
-  RESPONSE_CODE_UNAUTHORIZED,
-} from "../constants/responseCodes";
-import { User } from "../models";
+
+export interface CurrentUser {
+  id: string;
+  email: string;
+  role: string;
+}
 
 async function authenticateUser(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
-  try {
-    const userId = req.header("x-user-id") as string;
-    if (!userId) {
-      return res.status(401).json({
-        data: null,
-        error: {
-          message: "Header x-user-id is missing",
-        },
-      });
-    }
+  const authHeader = req.headers.authorization;
 
-    const user = await User.findOne({ _id: userId }).exec();
-
-    if (!user) {
-      return res.status(RESPONSE_CODE_UNAUTHORIZED).json({
-        data: null,
-        error: {
-          message: "No user with such id",
-        },
-      });
-    }
-
-    (req as any).user = user;
-    next();
-  } catch (error) {
-    console.error("Error authenticating user:", error);
-
-    return res.status(RESPONSE_CODE_SERVER_ERROR).json({
-      data: null,
-      error: {
-        message: "Error authenticating user",
-      },
-    });
+  if (!authHeader) {
+    return res.status(401).send("Token is required");
   }
+
+  const [tokenType, token] = authHeader.split(" ");
+
+  if (tokenType !== "Bearer") {
+    return res.status(403).send("Invalid Token");
+  }
+
+  try {
+    const user = jwt.verify(token, process.env.TOKEN_KEY!) as CurrentUser;
+
+    req.user = user;
+  } catch (err) {
+    return res.status(401).send("Invalid Token");
+  }
+  return next();
 }
 
 export { authenticateUser };

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { CartItemType, User } from "../types/types";
+import { CartItemType } from "../types/types";
 import {
   RESPONSE_CODE_OK,
   RESPONSE_CODE_SERVER_ERROR,
@@ -9,7 +9,7 @@ import { Cart } from "../models";
 
 export async function createCart(req: Request, res: Response) {
   try {
-    const userId = (req as any).user.id;
+    const userId = (req as any).user._id;
     const { items } = req.body;
     const cart = await createUserCart(userId, items);
 
@@ -27,9 +27,8 @@ export async function createCart(req: Request, res: Response) {
 
 export async function getCart(req: Request, res: Response) {
   try {
-    const userId = ((req as any).user as User).id;
-
-    const cart = await getUserCart(userId);
+    const { user_id } = (req as any).user;
+    const cart = await getUserCart(user_id);
 
     const totalPrice = cart.items.reduce(
       (total: number, item: CartItemType) =>
@@ -50,7 +49,7 @@ export async function getCart(req: Request, res: Response) {
 }
 
 export async function updateCart(req: Request, res: Response) {
-  const userId = ((req as any).user as User).id;
+  const userId = (req as any).user._id;
   const updatedCart = req.body;
 
   try {
@@ -79,7 +78,7 @@ export async function updateCart(req: Request, res: Response) {
 }
 
 export async function deleteCart(req: Request, res: Response) {
-  const userId = ((req as any).user as User).id;
+  const userId = (req as any).user._id;
 
   try {
     const userCart = await Cart.findOne({

@@ -2,10 +2,13 @@ import { Request } from "express";
 import { EntityManager } from "@mikro-orm/core";
 import { ObjectId } from "mongoose";
 
-export interface User {
-  id: string;
-  username: string;
+export interface IUser {
+  _id: ObjectId;
+  first_name: string;
+  last_name: string;
   email: string;
+  password: string;
+  role: string;
 }
 
 export interface CartItemType {
