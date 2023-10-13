@@ -9,9 +9,9 @@ import { Cart } from "../models";
 
 export async function createCart(req: Request, res: Response) {
   try {
-    const userId = (req as any).user._id;
+    const { user_id } = (req as any).user;
     const { items } = req.body;
-    const cart = await createUserCart(userId, items);
+    const cart = await createUserCart(user_id, items);
 
     res.status(201).json({
       data: { cart, totalPrice: 0 },
@@ -49,11 +49,11 @@ export async function getCart(req: Request, res: Response) {
 }
 
 export async function updateCart(req: Request, res: Response) {
-  const userId = (req as any).user._id;
+  const { user_id } = (req as any).user;
   const updatedCart = req.body;
 
   try {
-    const cart = await updateUserCart(userId, updatedCart.items);
+    const cart = await updateUserCart(user_id, updatedCart.items);
 
     const totalPrice = cart.items.reduce(
       (total: number, item: CartItemType) => {
@@ -78,11 +78,11 @@ export async function updateCart(req: Request, res: Response) {
 }
 
 export async function deleteCart(req: Request, res: Response) {
-  const userId = (req as any).user._id;
+  const { user_id } = (req as any).user;
 
   try {
     const userCart = await Cart.findOne({
-      user: userId,
+      user: user_id,
       isDeleted: false,
     });
 

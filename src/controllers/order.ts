@@ -8,8 +8,8 @@ import { getUserCart } from "../services/cart";
 import { createOrder } from "../services/order";
 
 export async function checkoutOrder(req: Request, res: Response) {
-  const userId = (req as any).user.id;
-  const userCart = await getUserCart(userId);
+  const { user_id } = (req as any).user;
+  const userCart = await getUserCart(user_id);
 
   if (!userCart?.items || userCart.items.length === 0) {
     return res.status(RESPONSE_CODE_BAD_REQUEST).json({
@@ -27,7 +27,7 @@ export async function checkoutOrder(req: Request, res: Response) {
       deliveryAddress,
     } = req.body;
     const newOrder = await createOrder(
-      userId,
+      user_id,
       userCart,
       paymentType,
       paymentAddress,
