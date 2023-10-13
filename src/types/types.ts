@@ -11,30 +11,30 @@ export interface IUser {
   role: string;
 }
 
-export interface CartItemType {
-  product: ProductType;
+export interface ICartItem {
+  product: IProduct;
   count: number;
 }
 
-export interface CartType {
+export interface ICart {
   _id: ObjectId;
   user: ObjectId;
   isDeleted: boolean;
-  items: CartItemType[];
+  items: ICartItem[];
 }
 
-export interface ProductType {
+export interface IProduct {
   _id: ObjectId;
   title: string;
   description: string;
   price: number;
 }
 
-export interface Order {
+export interface IOrder {
   id: string;
   userId: string;
   cartId: string;
-  items: CartItemType[];
+  items: ICartItem[];
   payment: {
     type: string;
     address: string;

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { CartItemType } from "../types/types";
+import { ICartItem } from "../types/types";
 import {
   RESPONSE_CODE_OK,
   RESPONSE_CODE_SERVER_ERROR,
@@ -31,7 +31,7 @@ export async function getCart(req: Request, res: Response) {
     const cart = await getUserCart(user_id);
 
     const totalPrice = cart.items.reduce(
-      (total: number, item: CartItemType) =>
+      (total: number, item: ICartItem) =>
         total + item.product.price * item.count,
       0
     );
@@ -55,15 +55,12 @@ export async function updateCart(req: Request, res: Response) {
   try {
     const cart = await updateUserCart(user_id, updatedCart.items);
 
-    const totalPrice = cart.items.reduce(
-      (total: number, item: CartItemType) => {
-        if (item.product) {
-          return total + item.product.price * item.count;
-        }
-        return total;
-      },
-      0
-    );
+    const totalPrice = cart.items.reduce((total: number, item: ICartItem) => {
+      if (item.product) {
+        return total + item.product.price * item.count;
+      }
+      return total;
+    }, 0);
 
     res.status(RESPONSE_CODE_OK).json({
       data: { cart: cart, totalPrice },
