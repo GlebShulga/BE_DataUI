@@ -1,5 +1,9 @@
 import * as jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
+import {
+  RESPONSE_CODE_FORBIDDEN,
+  RESPONSE_CODE_UNAUTHORIZED,
+} from "../constants/responseCodes";
 
 export interface CurrentUser {
   id: string;
@@ -15,13 +19,13 @@ async function authenticateUser(
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
-    return res.status(401).send("Token is required");
+    return res.status(RESPONSE_CODE_UNAUTHORIZED).send("Token is required");
   }
 
   const [tokenType, token] = authHeader.split(" ");
 
   if (tokenType !== "Bearer") {
-    return res.status(403).send("Invalid Token");
+    return res.status(RESPONSE_CODE_FORBIDDEN).send("Invalid Token");
   }
 
   try {
@@ -29,7 +33,7 @@ async function authenticateUser(
 
     req.user = user;
   } catch (err) {
-    return res.status(401).send("Invalid Token");
+    return res.status(RESPONSE_CODE_FORBIDDEN).send("Invalid Token");
   }
   return next();
 }

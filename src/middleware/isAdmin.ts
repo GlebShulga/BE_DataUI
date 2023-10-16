@@ -1,10 +1,13 @@
 import { Request, Response, NextFunction } from "express";
+import { RESPONSE_CODE_FORBIDDEN } from "../constants/responseCodes";
 
 export function isAdmin(req: Request, res: Response, next: NextFunction) {
   const currentUser = req.user;
 
   if (currentUser.role !== "admin") {
-    return res.status(401).send("Only admin can delete cart");
+    return res
+      .status(RESPONSE_CODE_FORBIDDEN)
+      .send("Only admin can delete cart");
   }
   next();
 }

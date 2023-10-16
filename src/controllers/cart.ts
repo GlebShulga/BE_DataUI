@@ -6,12 +6,13 @@ import {
 } from "../constants/responseCodes";
 import { createUserCart, getUserCart, updateUserCart } from "../services/cart";
 import { Cart } from "../models";
+import { CurrentUser } from "../auth";
 
 export async function createCart(req: Request, res: Response) {
   try {
-    const { user_id } = (req as any).user;
+    const { id: userId } = req.user as CurrentUser;
     const { items } = req.body;
-    const cart = await createUserCart(user_id, items);
+    const cart = await createUserCart(userId, items);
 
     res.status(201).json({
       data: { cart, totalPrice: 0 },
@@ -27,8 +28,8 @@ export async function createCart(req: Request, res: Response) {
 
 export async function getCart(req: Request, res: Response) {
   try {
-    const { user_id } = (req as any).user;
-    const cart = await getUserCart(user_id);
+    const { id: userId } = req.user as CurrentUser;
+    const cart = await getUserCart(userId);
 
     const totalPrice = cart.items.reduce(
       (total: number, item: ICartItem) =>
@@ -49,11 +50,11 @@ export async function getCart(req: Request, res: Response) {
 }
 
 export async function updateCart(req: Request, res: Response) {
-  const { user_id } = (req as any).user;
+  const { id: userId } = req.user as CurrentUser;
   const updatedCart = req.body;
 
   try {
-    const cart = await updateUserCart(user_id, updatedCart.items);
+    const cart = await updateUserCart(userId, updatedCart.items);
 
     const totalPrice = cart.items.reduce((total: number, item: ICartItem) => {
       if (item.product) {
@@ -75,11 +76,11 @@ export async function updateCart(req: Request, res: Response) {
 }
 
 export async function deleteCart(req: Request, res: Response) {
-  const { user_id } = (req as any).user;
+  const { id: userId } = req.user as CurrentUser;
 
   try {
     const userCart = await Cart.findOne({
-      user: user_id,
+      user: userId,
       isDeleted: false,
     });
 

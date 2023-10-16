@@ -6,10 +6,11 @@ import {
 } from "../constants/responseCodes";
 import { getUserCart } from "../services/cart";
 import { createOrder } from "../services/order";
+import { CurrentUser } from "../auth";
 
 export async function checkoutOrder(req: Request, res: Response) {
-  const { user_id } = (req as any).user;
-  const userCart = await getUserCart(user_id);
+  const { id: userId } = req.user as CurrentUser;
+  const userCart = await getUserCart(userId);
 
   if (!userCart?.items || userCart.items.length === 0) {
     return res.status(RESPONSE_CODE_BAD_REQUEST).json({
@@ -27,7 +28,7 @@ export async function checkoutOrder(req: Request, res: Response) {
       deliveryAddress,
     } = req.body;
     const newOrder = await createOrder(
-      user_id,
+      userId,
       userCart,
       paymentType,
       paymentAddress,

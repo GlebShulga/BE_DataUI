@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import {
+  RESPONSE_CODE_NOT_FOUND,
   RESPONSE_CODE_OK,
   RESPONSE_CODE_SERVER_ERROR,
 } from "../constants/responseCodes";
@@ -33,7 +34,7 @@ export async function getProductById(req: Request, res: Response) {
     const product = await Product.findById(productId);
 
     if (!product) {
-      return res.status(404).json({
+      return res.status(RESPONSE_CODE_NOT_FOUND).json({
         data: null,
         error: { message: "No product with such ID" },
       });
