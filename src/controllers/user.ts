@@ -7,10 +7,10 @@ import { RESPONSE_CODE_BAD_REQUEST } from "../constants/responseCodes";
 export async function userRegistration(req: Request, res: Response) {
   try {
     // Get user input
-    const { first_name, last_name, isAdmin, email, password } = req.body;
+    const { firstName, lastName, isAdmin, email, password } = req.body;
 
     // Validate user input
-    if (!(email && password && first_name && last_name)) {
+    if (!(email && password && firstName && lastName)) {
       res.status(RESPONSE_CODE_BAD_REQUEST).send("All input is required");
     }
 
@@ -25,9 +25,9 @@ export async function userRegistration(req: Request, res: Response) {
 
     const encryptedPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create({
-      first_name,
-      last_name,
+    await User.create({
+      firstName,
+      lastName,
       email: email.toLowerCase(),
       password: encryptedPassword,
       role: isAdmin === "true" ? "admin" : "user",
