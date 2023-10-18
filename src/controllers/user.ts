@@ -1,8 +1,14 @@
 import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import logger from "../logs/logger";
 import { User } from "../models";
-import { RESPONSE_CODE_BAD_REQUEST } from "../constants/responseCodes";
+import {
+  RESPONSE_CODE_BAD_REQUEST,
+  RESPONSE_CODE_CREATED,
+  RESPONSE_CODE_OK,
+  RESPONSE_CODE_SERVER_ERROR,
+} from "../constants/responseCodes";
 
 export async function userRegistration(req: Request, res: Response) {
   try {
@@ -23,7 +29,8 @@ export async function userRegistration(req: Request, res: Response) {
         .send("User Already Exist. Please Login");
     }
 
-    const encryptedPassword = await bcrypt.hash(password, 10);
+    const salt = await bcrypt.genSalt(10);
+    const encryptedPassword = await bcrypt.hash(password, salt);
 
     await User.create({
       firstName,
@@ -33,10 +40,12 @@ export async function userRegistration(req: Request, res: Response) {
       role: isAdmin === "true" ? "admin" : "user",
     });
 
-    res.status(201).send("User successfully registered");
+    logger.info(`User ${email} successfully registered`);
+
+    res.status(RESPONSE_CODE_CREATED).send("User successfully registered");
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Internal Server Error");
+    logger.error("Internal Server Error");
+    res.status(RESPONSE_CODE_SERVER_ERROR).send("Internal Server Error");
   }
 }
 
@@ -59,16 +68,19 @@ export async function userLogin(req: Request, res: Response) {
         process.env.TOKEN_KEY!,
         {
           expiresIn: "2h",
-        }
+        },
       );
 
-      return res.status(200).json({
+      logger.info(`User ${email} successfully logged in`);
+
+      return res.status(RESPONSE_CODE_OK).json({
         token,
       });
     }
+
     res.status(RESPONSE_CODE_BAD_REQUEST).send("Invalid Credentials");
   } catch (err) {
-    console.log(err);
-    res.status(500).send("Internal Server Error");
+    logger.error("Internal Server Error");
+    res.status(RESPONSE_CODE_SERVER_ERROR).send("Internal Server Error");
   }
 }

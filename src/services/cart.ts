@@ -1,5 +1,5 @@
 import { Cart, User } from "../models";
-import { CartItemType, CartType } from "../types/types";
+import { ICartItem, ICart } from "../types/types";
 import { updateCartSchema } from "../helpers/validations";
 
 /**
@@ -9,8 +9,8 @@ import { updateCartSchema } from "../helpers/validations";
  */
 export async function createUserCart(
   userId: string,
-  items: CartItemType[]
-): Promise<CartType> {
+  items: ICartItem[],
+): Promise<ICart> {
   try {
     const user = await User.findById(userId);
 
@@ -47,7 +47,7 @@ export async function createUserCart(
  * @param userId The ID of the user for whom the cart is created.
  * @returns The existed or newly created cart.
  */
-export async function getUserCart(userId: string): Promise<CartType> {
+export async function getUserCart(userId: string): Promise<ICart> {
   const user = await User.findById(userId);
 
   if (!user) {
@@ -65,8 +65,8 @@ export async function getUserCart(userId: string): Promise<CartType> {
 
 export async function updateUserCart(
   userId: string,
-  cartItems: CartItemType[]
-): Promise<CartType> {
+  cartItems: ICartItem[],
+): Promise<ICart> {
   try {
     const userCart = await Cart.findOne({
       user: userId,

@@ -1,14 +1,14 @@
 import { Order } from "../models";
-import { CartType } from "../types/types";
+import { ICart } from "../types/types";
 
 export async function createOrder(
   userId: string,
-  userCart: CartType,
+  userCart: ICart,
   paymentType: string,
   paymentAddress: string,
   paymentCreditCard: string,
   deliveryType: string,
-  deliveryAddress: string
+  deliveryAddress: string,
 ) {
   const newOrder = new Order({
     user: userId,
