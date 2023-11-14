@@ -9,6 +9,7 @@ import {
   RESPONSE_CODE_OK,
   RESPONSE_CODE_SERVER_ERROR,
 } from "../constants/responseCodes";
+import mongoose from "mongoose";
 
 export async function userRegistration(req: Request, res: Response) {
   try {
@@ -51,6 +52,7 @@ export async function userRegistration(req: Request, res: Response) {
 
 export async function userLogin(req: Request, res: Response) {
   try {
+    mongoose.connection.useDb("test");
     // Get user input
     const { email, password } = req.body;
 

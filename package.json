@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "DEBUG=my-app:* nodemon src/index.ts",
+    "start": "nodemon src/index.ts",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "pre-commit": "npm run lint",

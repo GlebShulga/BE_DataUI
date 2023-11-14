@@ -1,25 +1,66 @@
 import { Request, Response } from "express";
+import { Product, Category } from "../models/productCategory";
 import {
   RESPONSE_CODE_NOT_FOUND,
   RESPONSE_CODE_OK,
   RESPONSE_CODE_SERVER_ERROR,
 } from "../constants/responseCodes";
-import { Product } from "../models";
 
-export async function getProductsList(req: Request, res: Response) {
+export async function amazonSearchProductOrCategory(
+  req: Request,
+  res: Response,
+) {
+  const PRODUCT_SEARCH_TYPE = "STYLE_SEARCH";
+  const CATEGORY_SEARCH_TYPE = "CATEGORY_SEARCH";
+  const PAGE_SIZE = 5;
+
+  const searchTerm = req.body.query;
+  const type = req.body.searchType;
+  const currentPage = req.body.currentPage ?? 0;
+
   try {
-    const productList = await Product.find(
-      {},
-      { _id: 1, title: 1, description: 1, price: 1 }
-    );
+    let query = {};
+
+    if (searchTerm) {
+      const searchFields = [
+        { styleCode: { $regex: searchTerm, $options: "i" } },
+        { catalogVersion: { $regex: searchTerm, $options: "i" } },
+        { brandName: { $regex: searchTerm, $options: "i" } },
+      ];
+      query = {
+        $or: searchFields,
+      };
+    }
+
+    let Model;
+    if (type === PRODUCT_SEARCH_TYPE) {
+      Model = Product;
+    } else if (type === CATEGORY_SEARCH_TYPE) {
+      Model = Category;
+    } else {
+      throw new Error("Invalid search type");
+    }
+
+    const totalResults = await Model.countDocuments(query);
+    const totalPages = Math.ceil(totalResults / PAGE_SIZE);
+
+    const productCategory = await Model.find(query)
+      .skip(currentPage * PAGE_SIZE)
+      .limit(PAGE_SIZE);
 
     res.status(RESPONSE_CODE_OK).json({
-      data: productList,
+      products: productCategory,
+      pagination: {
+        currentPage,
+        pageSize: PAGE_SIZE,
+        totalPages,
+        totalResults,
+      },
       error: null,
     });
   } catch (error) {
     const errorMessage =
-      "Error fetching products: " +
+      "Error searching product or category: " +
       (error instanceof Error ? error.message : "Unknown error");
     res.status(RESPONSE_CODE_SERVER_ERROR).json({
       data: null,
@@ -28,28 +69,25 @@ export async function getProductsList(req: Request, res: Response) {
   }
 }
 
-export async function getProductById(req: Request, res: Response) {
+export async function getProductById(styleCode: string) {
+  const product = await Product.findOne({ styleCode });
+  if (!product) {
+    throw new Error("No product with such ID");
+  }
+  return product;
+}
+
+export async function amazonGetProductById(req: Request, res: Response) {
   try {
-    const productId = req.params.productId;
-    const product = await Product.findById(productId);
-
-    if (!product) {
-      return res.status(RESPONSE_CODE_NOT_FOUND).json({
-        data: null,
-        error: { message: "No product with such ID" },
-      });
-    }
-
-    res.status(RESPONSE_CODE_OK).json({
-      data: product,
-      error: null,
-    });
+    const styleCode = req.params.productId;
+    const product = await getProductById(styleCode);
+    res.status(RESPONSE_CODE_OK).json(product);
   } catch (error) {
     const errorMessage =
       "Error fetching product: " +
       (error instanceof Error ? error.message : "Unknown error");
     res.status(RESPONSE_CODE_SERVER_ERROR).json({
-      data: null,
+      results: null,
       error: { message: errorMessage },
     });
   }

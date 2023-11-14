@@ -11,8 +11,7 @@ import {
   getCart,
   updateCart,
   checkoutOrder,
-  getProductById,
-  getProductsList,
+  getPromo,
 } from "./controllers";
 import { authenticateUser, CurrentUser } from "./auth";
 import { userLogin, userRegistration } from "./controllers/user";
@@ -22,6 +21,35 @@ import {
   RESPONSE_CODE_OK,
   RESPONSE_CODE_SERVER_ERROR,
 } from "./constants/responseCodes";
+import {
+  amazonSearchPromo,
+  amazonGetPromoById,
+  amazonSavePromo,
+} from "./controllers/amazonPromotion";
+import {
+  iHerbGetPromoById,
+  iHerbSavePromo,
+  iHerbSearchPromo,
+} from "./controllers/iHerbPromotion";
+import {
+  amazonGetVoucherById,
+  amazonSaveVoucher,
+  amazonSearchVoucher,
+} from "./controllers/amazonVouchers";
+import {
+  amazonGetPriceById,
+  amazonSavePrice,
+  amazonSearchPrices,
+} from "./controllers/amazonPrices";
+import {
+  iHerbGetPriceById,
+  iHerbSavePrice,
+  iHerbSearchPrices,
+} from "./controllers/iHerbPrices";
+import {
+  amazonGetProductById,
+  amazonSearchProductOrCategory,
+} from "./controllers/product";
 
 declare global {
   namespace Express {
@@ -33,7 +61,7 @@ declare global {
 
 dotenv.config();
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8000;
 const server = app.listen(port);
 
 const debugLogger = debug("node-app");
@@ -98,13 +126,16 @@ process.on("SIGINT", shutdown);
 async function main() {
   const uri = process.env.MONGODB_URI || "mongodb://localhost:27017/nodejs";
 
+  const userDBName = process.env.USER_MONGODB_DB_NAME || "test";
+
   const options = {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     heartbeatFrequencyMS: 1000,
+    // dbName: userDBName,
   };
 
-  await mongoose.connect(uri, options);
+  mongoose.connect(uri, options);
 
   app.use(
     morgan("combined", {
@@ -164,11 +195,31 @@ async function main() {
   // Create an order
   app.post("/api/profile/cart/checkout", checkoutOrder);
 
-  // Returns a list of products
-  app.get("/api/products", getProductsList);
+  // Fetch products or categories
+  app.post("/ccv2/v2/AM/dataUi/search", amazonSearchProductOrCategory);
+  app.get("/am/v1/products/:productId", amazonGetProductById);
 
-  // Returns a single product
-  app.get("/api/products/:productId", getProductById);
+  app.get("/am/v1/promotions", getPromo);
+
+  app.get("/am/v1/promotions/:promotionId", amazonGetPromoById);
+  app.post("/am/v1/promotions/save", amazonSavePromo);
+  app.post("/am/v1/promotions/search", amazonSearchPromo);
+
+  app.get("/ih/v1/promotions/:promotionId", iHerbGetPromoById);
+  app.post("/ih/v1/promotions/save", iHerbSavePromo);
+  app.post("/ih/v1/promotions/search", iHerbSearchPromo);
+
+  app.get("/am/v1/vouchers/:voucherId", amazonGetVoucherById);
+  app.post("/am/v1/vouchers/search", amazonSearchVoucher);
+  app.put("/am/v1/vouchers", amazonSaveVoucher);
+
+  app.get("/am/v1/prices/:priceId", amazonGetPriceById);
+  app.post("/am/v1/prices/search", amazonSearchPrices);
+  app.put("/am/v1/prices", amazonSavePrice);
+
+  app.get("/ih/v1/prices/:priceId", iHerbGetPriceById);
+  app.post("/ih/v1/prices/search", iHerbSearchPrices);
+  app.post("/ih/v1/prices/updateDescription", iHerbSavePrice);
 }
 
 main().catch((error) => {
