@@ -2,19 +2,19 @@ import { Predicate, SearchField } from "../../types/commonTypes";
 
 export const createQuery = (
   predicates: Predicate[],
-  promotionType: string,
+  type: string,
   queryOperator: string,
   searchFields: SearchField[],
 ) => {
   let query = {};
 
-  if (predicates.length > 0 && promotionType) {
+  if (predicates.length > 0 && type) {
     query = {
-      promotionType,
+      type,
       [queryOperator]: searchFields,
     };
-  } else if (promotionType) {
-    query = { promotionType };
+  } else if (type) {
+    query = { type };
   } else if (predicates.length > 0) {
     query = {
       [queryOperator]: searchFields,

@@ -10,31 +10,26 @@ import {
   PromotionalAmazonVoucher,
   SerialAmazonVoucher,
 } from "../models/amazonVoucher";
+import { PredicateRelation } from "../types/commonTypes";
+import { createSearchFields } from "./helpers/createSearchFields";
+import { createQuery } from "./helpers/createQuery";
 
 export async function amazonSearchVoucher(req: Request, res: Response) {
-  const searchTerm = req.body.searchTerm;
+  const { predicates } = req.body;
   const voucherType = req.body.voucherType;
+  const predicateRelation = req.body.predicateRelation;
+
+  const queryOperator =
+    predicateRelation === PredicateRelation.AND ? "$and" : "$or";
 
   try {
-    let query = {};
-
-    const searchFields = [
-      { code: { $regex: searchTerm, $options: "i" } },
-      { voucherName: { $regex: searchTerm, $options: "i" } },
-    ];
-
-    if (searchTerm && voucherType) {
-      query = {
-        voucherType,
-        $or: searchFields,
-      };
-    } else if (voucherType) {
-      query = { voucherType };
-    } else if (searchTerm) {
-      query = {
-        $or: searchFields,
-      };
-    }
+    const searchFields = createSearchFields(predicates);
+    const query = createQuery(
+      predicates,
+      voucherType,
+      queryOperator,
+      searchFields,
+    );
 
     const vouchers = await AmazonVoucher.find(query);
 

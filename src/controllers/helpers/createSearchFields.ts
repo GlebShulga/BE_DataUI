@@ -61,6 +61,14 @@ export const createSearchFields = (predicates: Predicate[]): SearchField[] => {
         return {
           zones: { $elemMatch: { effectiveFrom: value } },
         };
+      case "voucherStartDate":
+        return {
+          $elemMatch: { effectiveFrom: value },
+        };
+      case "voucherEndDate":
+        return {
+          $elemMatch: { effectiveTo: value },
+        };
       default:
         return { [column]: value };
     }
