@@ -75,9 +75,9 @@ export async function iHerbSearchPromo(req: Request, res: Response) {
     const searchFields = createSearchFields(predicates);
     const query = createQuery(
       predicates,
-      promotionType,
       queryOperator,
       searchFields,
+      promotionType,
     );
 
     console.log("searchFields:", searchFields);

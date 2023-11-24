@@ -85,9 +85,9 @@ export async function amazonSearchPromo(req: Request, res: Response) {
     const searchFields = createSearchFields(predicates);
     const query = createQuery(
       predicates,
-      promotionType,
       queryOperator,
       searchFields,
+      promotionType,
     );
 
     const promotions = await AmazonPromotion.find(query);

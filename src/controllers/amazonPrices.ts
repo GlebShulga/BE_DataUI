@@ -5,24 +5,19 @@ import {
   RESPONSE_CODE_OK,
   RESPONSE_CODE_SERVER_ERROR,
 } from "../constants/responseCodes";
+import { PredicateRelation } from "../types/commonTypes";
+import { createSearchFields } from "./helpers/createSearchFields";
+import { createQuery } from "./helpers/createQuery";
 
 export async function amazonSearchPrices(req: Request, res: Response) {
-  const searchTerm = req.body.searchTerm;
+  const { predicates } = req.body;
+  const predicateRelation = req.body.predicateRelation;
 
+  const queryOperator =
+    predicateRelation === PredicateRelation.AND ? "$and" : "$or";
   try {
-    let query = {};
-
-    const searchFields = [
-      { pmmId: { $regex: searchTerm, $options: "i" } },
-      { name: { $regex: searchTerm, $options: "i" } },
-      { description: { $regex: searchTerm, $options: "i" } },
-    ]; // TODO: check which fields are searchable for Price
-
-    if (searchTerm) {
-      query = {
-        $or: searchFields,
-      };
-    }
+    const searchFields = createSearchFields(predicates);
+    const query = createQuery(predicates, queryOperator, searchFields);
 
     const price = await AmazonPrice.find(query);
 

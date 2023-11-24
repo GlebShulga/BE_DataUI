@@ -2,9 +2,9 @@ import { Predicate, SearchField } from "../../types/commonTypes";
 
 export const createQuery = (
   predicates: Predicate[],
-  type: string,
   queryOperator: string,
   searchFields: SearchField[],
+  type?: string,
 ) => {
   let query = {};
 
