@@ -80,8 +80,6 @@ export async function iHerbSearchPromo(req: Request, res: Response) {
       promotionType,
     );
 
-    console.log("searchFields:", searchFields);
-
     const promotions = await IHerbPromotion.find(query);
     const totalCount = promotions.length;
 
@@ -105,7 +103,7 @@ export async function iHerbSavePromo(req: Request, res: Response) {
   try {
     const savedPromo = req.body;
     const pmmId = savedPromo.pmmId;
-    console.log(savedPromo);
+
     let promotion;
 
     switch (savedPromo.promotionType) {

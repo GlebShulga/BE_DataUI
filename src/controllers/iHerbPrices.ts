@@ -5,35 +5,29 @@ import {
   RESPONSE_CODE_OK,
   RESPONSE_CODE_SERVER_ERROR,
 } from "../constants/responseCodes";
+import { PredicateRelation } from "../types/commonTypes";
+import { createSearchFields } from "./helpers/createSearchFields";
+import { createQuery } from "./helpers/createQuery";
 
 export async function iHerbSearchPrices(req: Request, res: Response) {
-  const searchTerm = req.body.searchTerm;
-  const { type } = req.body;
+  const { predicates } = req.body;
+
+  const priceType = req.body.type;
+  const predicateRelation = req.body.predicateRelation;
+
+  const queryOperator =
+    predicateRelation === PredicateRelation.AND ? "$and" : "$or";
 
   try {
-    let query = {};
-
-    const searchFields = [
-      { pmmId: { $regex: searchTerm, $options: "i" } },
-      { name: { $regex: searchTerm, $options: "i" } },
-      { description: { $regex: searchTerm, $options: "i" } },
-    ]; // TODO: check which fields are searchable for Price
-
-    if (searchTerm && type) {
-      query = {
-        type,
-        $or: searchFields,
-      };
-    } else if (type) {
-      query = { type };
-    } else if (searchTerm) {
-      query = {
-        $or: searchFields,
-      };
-    }
+    const searchFields = createSearchFields(predicates);
+    const query = createQuery(
+      predicates,
+      queryOperator,
+      searchFields,
+      priceType,
+    );
 
     const price = await IHerbPrice.find(query);
-
     const totalCount = price.length;
 
     res.status(RESPONSE_CODE_OK).json({

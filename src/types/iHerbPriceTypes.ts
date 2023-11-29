@@ -1,8 +1,16 @@
-import { Document } from "mongoose";
+import { Document, Types } from "mongoose";
 import { LocalizedDescription } from "./commonTypes";
 
+type PriceEventIdType = number | string;
+
+interface IPriceEventId extends Types.Subdocument {
+  value: PriceEventIdType;
+  toString: () => string;
+  toNumber: () => number;
+}
+
 export interface IHerbPrice {
-  priceEventId: number;
+  priceEventId: IPriceEventId;
   priceEventDescription: string;
   priceTypeDto: string;
   effectiveFrom: Date;

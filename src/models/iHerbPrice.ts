@@ -4,7 +4,12 @@ import { localizedDescriptionSchema } from "./amazonVoucher";
 
 const IHerbPriceSchema = new Schema<IHerbPriceDocument>(
   {
-    priceEventId: { type: Number, required: true },
+    priceEventId: {
+      type: Schema.Types.Mixed,
+      required: true,
+      get: (value: string) => parseInt(value, 10),
+      set: (value: number) => value.toString(),
+    },
     priceEventDescription: { type: String, required: true },
     priceTypeDto: { type: String, required: false },
     effectiveFrom: { type: Date, required: true },
