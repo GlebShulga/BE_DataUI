@@ -5,16 +5,17 @@ export const createQuery = (
   queryOperator: string,
   searchFields: SearchField[],
   type?: string,
+  typePropertyName: string = "type",
 ) => {
   let query = {};
 
   if (predicates.length > 0 && type) {
     query = {
-      type,
+      [typePropertyName]: type,
       [queryOperator]: searchFields,
     };
   } else if (type) {
-    query = { type };
+    query = { [typePropertyName]: type };
   } else if (predicates.length > 0) {
     query = {
       [queryOperator]: searchFields,

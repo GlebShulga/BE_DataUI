@@ -78,6 +78,7 @@ export async function iHerbSearchPromo(req: Request, res: Response) {
       queryOperator,
       searchFields,
       promotionType,
+      "promotionType",
     );
 
     const promotions = await IHerbPromotion.find(query);

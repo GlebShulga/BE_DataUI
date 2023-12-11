@@ -29,6 +29,7 @@ export async function amazonSearchVoucher(req: Request, res: Response) {
       queryOperator,
       searchFields,
       voucherType,
+      "voucherType",
     );
 
     const vouchers = await AmazonVoucher.find(query);
