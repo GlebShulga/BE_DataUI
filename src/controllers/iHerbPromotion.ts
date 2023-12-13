@@ -64,9 +64,7 @@ export async function iHerbGetPromoById(req: Request, res: Response) {
 }
 
 export async function iHerbSearchPromo(req: Request, res: Response) {
-  const { predicates } = req.body;
-  const promotionType = req.body.type;
-  const predicateRelation = req.body.predicateRelation;
+  const { predicates, predicateRelation, type: promotionType } = req.body;
 
   const queryOperator =
     predicateRelation === PredicateRelation.AND ? "$and" : "$or";

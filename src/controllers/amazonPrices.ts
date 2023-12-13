@@ -10,8 +10,7 @@ import { createSearchFields } from "./helpers/createSearchFields";
 import { createQuery } from "./helpers/createQuery";
 
 export async function amazonSearchPrices(req: Request, res: Response) {
-  const { predicates } = req.body;
-  const predicateRelation = req.body.predicateRelation;
+  const { predicates, predicateRelation } = req.body;
 
   const queryOperator =
     predicateRelation === PredicateRelation.AND ? "$and" : "$or";

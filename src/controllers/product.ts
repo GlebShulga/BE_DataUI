@@ -13,9 +13,7 @@ export async function amazonSearchProductOrCategory(
   const CATEGORY_SEARCH_TYPE = "CATEGORY_SEARCH";
   const PAGE_SIZE = 5;
 
-  const searchTerm = req.body.query;
-  const type = req.body.searchType;
-  const currentPage = req.body.currentPage ?? 0;
+  const { query: searchTerm, searchType: type, currentPage = 0 } = req.body;
 
   try {
     let query = {};

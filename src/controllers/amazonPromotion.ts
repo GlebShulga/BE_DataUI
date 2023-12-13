@@ -75,8 +75,7 @@ export async function amazonGetPromoById(req: Request, res: Response) {
 }
 
 export async function amazonSearchPromo(req: Request, res: Response) {
-  const { predicates, type: promotionType } = req.body;
-  const predicateRelation = req.body.predicateRelation;
+  const { predicates, predicateRelation, type: promotionType } = req.body;
 
   const queryOperator =
     predicateRelation === PredicateRelation.AND ? "$and" : "$or";

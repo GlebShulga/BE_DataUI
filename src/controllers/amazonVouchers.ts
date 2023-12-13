@@ -15,9 +15,7 @@ import { createSearchFields } from "./helpers/createSearchFields";
 import { createQuery } from "./helpers/createQuery";
 
 export async function amazonSearchVoucher(req: Request, res: Response) {
-  const { predicates } = req.body;
-  const voucherType = req.body.voucherType;
-  const predicateRelation = req.body.predicateRelation;
+  const { predicates, predicateRelation, voucherType } = req.body;
 
   const queryOperator =
     predicateRelation === PredicateRelation.AND ? "$and" : "$or";

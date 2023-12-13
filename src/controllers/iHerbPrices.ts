@@ -10,10 +10,7 @@ import { createSearchFields } from "./helpers/createSearchFields";
 import { createQuery } from "./helpers/createQuery";
 
 export async function iHerbSearchPrices(req: Request, res: Response) {
-  const { predicates } = req.body;
-
-  const priceType = req.body.type;
-  const predicateRelation = req.body.predicateRelation;
+  const { predicates, predicateRelation, type: priceType } = req.body;
 
   const queryOperator =
     predicateRelation === PredicateRelation.AND ? "$and" : "$or";
