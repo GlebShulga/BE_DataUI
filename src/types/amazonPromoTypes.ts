@@ -23,6 +23,18 @@ export interface IAmazonVoucher {
   code?: string;
 }
 
+export interface IVoucherCode {
+  voucherId: number;
+  code: string;
+  dateTimeGenerated?: string;
+  quantityRedeemableVouchers?: number;
+  redemptionsPerCart?: number;
+  generationDate?: string;
+  used?: boolean;
+}
+
+export interface IVoucherCodeDocument extends IVoucherCode, Document {}
+
 export interface VoucherLocalizedDescription {
   locale: LOCALE;
   shortDescription?: string;

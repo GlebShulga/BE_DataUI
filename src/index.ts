@@ -5,17 +5,9 @@ import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import morgan from "morgan";
 import debug from "debug";
-import {
-  createCart,
-  deleteCart,
-  getCart,
-  updateCart,
-  checkoutOrder,
-  getPromo,
-} from "./controllers";
+import { getPromo } from "./controllers";
 import { authenticateUser, CurrentUser } from "./auth";
 import { userLogin, userRegistration } from "./controllers/user";
-import { isAdmin } from "./middleware/isAdmin";
 import logger from "./logs/logger";
 import {
   RESPONSE_CODE_OK,
@@ -25,31 +17,22 @@ import {
   amazonSearchPromo,
   amazonGetPromoById,
   amazonSavePromo,
-} from "./controllers/amazonPromotion";
-import {
   iHerbGetPromoById,
   iHerbSavePromo,
   iHerbSearchPromo,
-} from "./controllers/iHerbPromotion";
-import {
   amazonGetVoucherById,
   amazonSaveVoucher,
   amazonSearchVoucher,
-} from "./controllers/amazonVouchers";
-import {
   amazonGetPriceById,
   amazonSavePrice,
   amazonSearchPrices,
-} from "./controllers/amazonPrices";
-import {
   iHerbGetPriceById,
   iHerbSavePrice,
   iHerbSearchPrices,
-} from "./controllers/iHerbPrices";
-import {
   amazonGetProductById,
   amazonSearchProductOrCategory,
-} from "./controllers/product";
+  amazonSearchPromoVoucherCode,
+} from "./controllers";
 
 declare global {
   namespace Express {
@@ -126,8 +109,6 @@ process.on("SIGINT", shutdown);
 async function main() {
   const uri = process.env.MONGODB_URI || "mongodb://localhost:27017/nodejs";
 
-  const userDBName = process.env.USER_MONGODB_DB_NAME || "test";
-
   const options = {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -180,21 +161,6 @@ async function main() {
 
   app.use("/api", authenticateUser);
 
-  // Create user cart
-  app.post("/api/profile/cart", createCart);
-
-  // Get user cart
-  app.get("/api/profile/cart", getCart);
-
-  // Update user cart
-  app.put("/api/profile/cart", updateCart);
-
-  // Empty user cart
-  app.delete("/api/profile/cart", isAdmin, deleteCart);
-
-  // Create an order
-  app.post("/api/profile/cart/checkout", checkoutOrder);
-
   // Fetch products or categories
   app.post("/ccv2/v2/AM/dataUi/search", amazonSearchProductOrCategory);
   app.get("/am/v1/products/:productId", amazonGetProductById);
@@ -204,6 +170,8 @@ async function main() {
   app.get("/am/v1/promotions/:promotionId", amazonGetPromoById);
   app.post("/am/v1/promotions/save", amazonSavePromo);
   app.post("/am/v1/promotions/search", amazonSearchPromo);
+
+  app.post("/am/v1/vouchers/serial/search", amazonSearchPromoVoucherCode);
 
   app.get("/ih/v1/promotions/:promotionId", iHerbGetPromoById);
   app.post("/ih/v1/promotions/save", iHerbSavePromo);

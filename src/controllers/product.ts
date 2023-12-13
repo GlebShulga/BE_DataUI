@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { Product, Category } from "../models/productCategory";
 import {
-  RESPONSE_CODE_NOT_FOUND,
   RESPONSE_CODE_OK,
   RESPONSE_CODE_SERVER_ERROR,
 } from "../constants/responseCodes";

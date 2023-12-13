@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import { Request, Response } from "express";
 import {
   RESPONSE_CODE_NOT_FOUND,
@@ -74,8 +75,7 @@ export async function amazonGetPromoById(req: Request, res: Response) {
 }
 
 export async function amazonSearchPromo(req: Request, res: Response) {
-  const { predicates } = req.body;
-  const promotionType = req.body.type;
+  const { predicates, type: promotionType } = req.body;
   const predicateRelation = req.body.predicateRelation;
 
   const queryOperator =
