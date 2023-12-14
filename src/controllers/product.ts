@@ -10,7 +10,9 @@ export async function amazonSearchProductOrCategory(
   res: Response,
 ) {
   const PRODUCT_SEARCH_TYPE = "STYLE_SEARCH";
+  const BULK_PRODUCT_SEARCH_TYPE = "STYLE_BULK_SEARCH";
   const CATEGORY_SEARCH_TYPE = "CATEGORY_SEARCH";
+  const BULK_CATEGORY_SEARCH_TYPE = "CATEGORY_BULK_SEARCH";
   const PAGE_SIZE = 5;
 
   const { query: searchTerm, searchType: type, currentPage = 0 } = req.body;
@@ -19,20 +21,33 @@ export async function amazonSearchProductOrCategory(
     let query = {};
 
     if (searchTerm) {
-      const searchFields = [
-        { styleCode: { $regex: searchTerm, $options: "i" } },
-        { catalogVersion: { $regex: searchTerm, $options: "i" } },
-        { brandName: { $regex: searchTerm, $options: "i" } },
-      ];
-      query = {
-        $or: searchFields,
-      };
+      if (
+        type === BULK_PRODUCT_SEARCH_TYPE ||
+        type === BULK_CATEGORY_SEARCH_TYPE
+      ) {
+        const styleCodes = searchTerm
+          .split(",")
+          .map((code: string) => code.trim());
+        query = { styleCode: { $in: styleCodes } };
+      } else {
+        const searchFields = [
+          { styleCode: { $regex: searchTerm, $options: "i" } },
+          { catalogVersion: { $regex: searchTerm, $options: "i" } },
+          { brandName: { $regex: searchTerm, $options: "i" } },
+        ];
+        query = {
+          $or: searchFields,
+        };
+      }
     }
 
     let Model;
-    if (type === PRODUCT_SEARCH_TYPE) {
+    if (type === PRODUCT_SEARCH_TYPE || type === BULK_PRODUCT_SEARCH_TYPE) {
       Model = Product;
-    } else if (type === CATEGORY_SEARCH_TYPE) {
+    } else if (
+      type === CATEGORY_SEARCH_TYPE ||
+      type === BULK_CATEGORY_SEARCH_TYPE
+    ) {
       Model = Category;
     } else {
       throw new Error("Invalid search type");
@@ -68,8 +83,18 @@ export async function amazonSearchProductOrCategory(
 
 export async function getProductById(styleCode: string) {
   const product = await Product.findOne({ styleCode });
+
   if (!product) {
     throw new Error("No product with such ID");
+  }
+  return product;
+}
+
+export async function getCategoryById(code: string) {
+  const product = await Product.findOne({ code });
+
+  if (!product) {
+    throw new Error("No category with such ID");
   }
   return product;
 }
@@ -77,6 +102,7 @@ export async function getProductById(styleCode: string) {
 export async function amazonGetProductById(req: Request, res: Response) {
   try {
     const styleCode = req.params.productId;
+    console.log("req.params:", req.params);
     const product = await getProductById(styleCode);
     res.status(RESPONSE_CODE_OK).json(product);
   } catch (error) {

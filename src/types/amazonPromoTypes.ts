@@ -43,7 +43,7 @@ export interface VoucherLocalizedDescription {
 
 export interface AmazonPromotionItem {
   item: string;
-  exclusion: boolean;
+  exclusion?: boolean;
   hierarchyLevel: hierarchyItemLevelByType;
   brand?: string;
   codeField?: string;

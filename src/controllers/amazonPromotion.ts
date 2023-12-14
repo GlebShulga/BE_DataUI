@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
 import { Request, Response } from "express";
 import {
   RESPONSE_CODE_NOT_FOUND,
@@ -15,7 +14,7 @@ import {
   XForYAmazonPromotion,
 } from "../models/amazonPromotion";
 import { AmazonPromotionItem } from "../types/amazonPromoTypes";
-import { getProductById } from "./product";
+import { getCategoryById, getProductById } from "./product";
 import {
   ProductCategory,
   hierarchyItemLevelByType,
@@ -24,31 +23,6 @@ import { Product } from "../models";
 import { PredicateRelation } from "../types/commonTypes";
 import { createSearchFields } from "./helpers/createSearchFields";
 import { createQuery } from "./helpers/createQuery";
-
-export async function getPromo(req: Request, res: Response) {
-  try {
-    const promotions = await AmazonPromotion.find(
-      {},
-      { pmmId: 1, name: 1, description: 1, price: 1 },
-    );
-
-    const totalCount = promotions.length;
-
-    res.status(RESPONSE_CODE_OK).json({
-      data: promotions,
-      totalCount,
-      error: null,
-    });
-  } catch (error) {
-    const errorMessage =
-      "Error fetching promotions: " +
-      (error instanceof Error ? error.message : "Unknown error");
-    res.status(RESPONSE_CODE_SERVER_ERROR).json({
-      data: null,
-      error: { message: errorMessage },
-    });
-  }
-}
 
 export async function amazonGetPromoById(req: Request, res: Response) {
   try {
@@ -197,20 +171,37 @@ export async function amazonSavePromo(req: Request, res: Response) {
         const existingItemIds = component.items.map((item) => item.styleCode);
 
         component.items = component.items.filter((item) =>
-          itemIds.includes(item.styleCode),
+          itemIds.includes(
+            item.hierarchyLevel === hierarchyItemLevelByType.PRODUCT
+              ? item.styleCode
+              : item.code,
+          ),
         );
 
         const newItemIds = itemIds.filter(
           (id: string) => !existingItemIds.includes(id),
         );
         for (const itemId of newItemIds) {
-          const product: ProductCategory = await getProductById(itemId);
-          const productDocument = new Product(product);
+          let itemDocument;
+          const newItem = newItems.find(
+            (item: AmazonPromotionItem) => item.item === itemId,
+          );
+          if (newItem.hierarchyLevel === hierarchyItemLevelByType.PRODUCT) {
+            const product: ProductCategory = await getProductById(itemId);
+            itemDocument = new Product(product);
+          } else if (
+            newItem.hierarchyLevel === hierarchyItemLevelByType.CATEGORY
+          ) {
+            const category: ProductCategory = await getCategoryById(itemId);
+            itemDocument = new Product(category);
+          }
 
-          component.items.push({
-            ...productDocument.toObject(),
-            hierarchyLevel: hierarchyItemLevelByType.PRODUCT,
-          });
+          if (itemDocument) {
+            component.items.push({
+              ...itemDocument.toObject(),
+              hierarchyLevel: newItem.hierarchyLevel,
+            });
+          }
         }
       }
     }

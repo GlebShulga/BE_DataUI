@@ -1,4 +1,3 @@
-export { getPromo } from "./amazonPromotion";
 export {
   amazonSearchPromo,
   amazonGetPromoById,

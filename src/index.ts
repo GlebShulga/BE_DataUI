@@ -5,7 +5,6 @@ import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import morgan from "morgan";
 import debug from "debug";
-import { getPromo } from "./controllers";
 import { authenticateUser, CurrentUser } from "./auth";
 import { userLogin, userRegistration } from "./controllers/user";
 import logger from "./logs/logger";
@@ -43,9 +42,9 @@ declare global {
 }
 
 dotenv.config();
-const app = express();
+export const app = express();
 const port = process.env.PORT || 8000;
-const server = app.listen(port);
+export const server = app.listen(port);
 
 const debugLogger = debug("node-app");
 
@@ -113,7 +112,6 @@ async function main() {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     heartbeatFrequencyMS: 1000,
-    // dbName: userDBName,
   };
 
   mongoose.connect(uri, options);
@@ -164,8 +162,6 @@ async function main() {
   // Fetch products or categories
   app.post("/ccv2/v2/AM/dataUi/search", amazonSearchProductOrCategory);
   app.get("/am/v1/products/:productId", amazonGetProductById);
-
-  app.get("/am/v1/promotions", getPromo);
 
   app.get("/am/v1/promotions/:promotionId", amazonGetPromoById);
   app.post("/am/v1/promotions/save", amazonSavePromo);
