@@ -4,15 +4,10 @@ import { app, server } from "../..";
 import {
   AmazonPromotion,
   MultiAmazonPromotion,
+  PriceBasedAmazonPromotion,
 } from "../../models/amazonPromotion";
 
 jest.mock("../../models/amazonPromotion");
-// jest.mock("../../models/MultiAmazonPromotion");
-// jest.mock("../../models/PriceBasedAmazonPromotion");
-// jest.mock("../../models/FixedDiscountAmazonPromotion");
-// jest.mock("../../models/ShippingAmazonPromotion");
-// jest.mock("../../models/XForYAmazonPromotion");
-// jest.mock("../../models/SpendAndGetAmazonPromotion");
 
 describe("amazonPromo", () => {
   afterAll(async () => {
@@ -27,7 +22,6 @@ describe("amazonPromo", () => {
         { promotionType: "type2" },
       ];
 
-      // Mock the AmazonPromotion.find method
       (AmazonPromotion.find as jest.Mock).mockResolvedValue(mockPromotions);
 
       const response = await request(app)
@@ -103,94 +97,283 @@ describe("amazonPromo", () => {
   });
 
   describe("amazonSavePromo", () => {
-    afterAll(async () => {
-      await server.close();
-    });
-
-    it("should create a new promotion if one does not already exist", async () => {
-      const mockPromotion = {
-        _id: {
-          $oid: "64e36ba866de4a205062e690",
+    const mockSaveMultiPromo = {
+      promotionType: "AM_MULTI",
+      pmmId: "f39406bf-fc93-11ed-b66e-005056a25d87",
+      name: "2 For Promo Private",
+      description: "2 For Promo Private",
+      priorityType: 500,
+      effectiveFrom: "2023-05-27T08:38:11.000",
+      effectiveTo: "2099-01-01T00:00:00.000",
+      romanceCopyApproved: true,
+      enabled: false,
+      localizedDescriptions: [
+        {
+          _id: "657add6be8917b12f1dd3a85",
+          pmmId: "f39406bf-fc93-11ed-b66e-005056a25d87",
+          locale: "en",
+          shortDescription: "2 For Promo Private SD",
+          longDescription: "2 For Promo Private LD",
         },
-        promotionType: "AM_MULTI",
-        pmmId: "ef785258-febc-11ed-b149-005056a22361",
-        name: "Sample Promo",
-        description: "Sample Promo",
-        priorityType: 500,
-        prioritySubType: 0,
-        priceDerivationRuleNumber: "1",
-        action: "UPDATE",
-        components: [
+      ],
+      version: 1,
+      totalRetailPrice: 50,
+      buyComponent: {
+        _id: "657add6be8917b12f1dd3a7f",
+        purchaseType: "ACTUAL",
+        quantity: 1,
+        promotionPart: "BUY",
+        rewardDerivationRuleNumber: 1,
+        items: [
           {
-            purchaseType: "ACTUAL",
-            quantity: 1,
-            promotionPart: "BUY",
-            rewardDerivationRuleNumber: 1,
-            items: [
-              {
-                item: "333519769",
-                exclusion: false,
-                hierarchyLevel: 1,
-              },
-            ],
-            id: 499159,
+            hierarchyLevel: 2,
+            item: "8001",
+          },
+          {
+            hierarchyLevel: 1,
+            item: "334020269",
+          },
+          {
+            hierarchyLevel: 1,
+            item: "333323951",
           },
         ],
-        zones: [
-          {
-            pmmId: "ef785258-febc-11ed-b149-005056a22361",
-            level: 1,
-            storesGroupId: 1,
-            effectiveFrom: {
-              $date: "2023-05-30T07:27:12.000Z",
-            },
-            modified: {
-              $date: "2023-05-30T05:38:42.000Z",
-            },
-            effectiveTo: {
-              $date: "2098-12-31T20:00:00.000Z",
-            },
-            priceModificationNumber: 1,
-          },
-        ],
+        id: 499160,
+      },
+    };
+
+    const mockPriceBasedPromo = {
+      sourceType: "MANUAL",
+      restrictions: [],
+      _id: "64e30b6166de4a205062e630",
+      promotionType: "AM_PRICE_BASED",
+      pmmId: "6945cde6-d212-11ed-93c5-005056a24e03",
+      name: "WBO10215",
+      description: "WBO10215a",
+      priorityType: 500,
+      zones: [
+        {
+          _id: "657c00aea5c9625c05dc2525",
+          effectiveFrom: "2023-04-03T12:34:25.000Z",
+          effectiveTo: "2098-12-31T20:00:00.000Z",
+          modified: "2023-04-03T12:34:25.000Z",
+        },
+      ],
+      actionLog: [
+        {
+          _id: "657c00aea5c9625c05dc2526",
+          pmmId: "6945cde6-d212-11ed-93c5-005056a24e03",
+          date: "2023-04-11T19:54:54.000Z",
+          enabled: true,
+        },
+      ],
+      romanceCopyApproved: true,
+      enabled: false,
+      localizedDescriptions: [
+        {
+          _id: "657c00aea5c9625c05dc2527",
+          pmmId: "6945cde6-d212-11ed-93c5-005056a24e03",
+          locale: "en",
+          shortDescription: "Test",
+          longDescription: "Test bug",
+        },
+      ],
+      voucher: {
+        id: 1001269,
+        description: "WBO10215",
+        voucherCode: {
+          code: "51EC82VC1J1MVV02DH",
+          quantityRedeemableVouchers: 3,
+          dateTimeGenerated: "2023-04-11T15:42:33.517",
+        },
+        voucherType: "PROMOTIONAL",
+        discountAmount: 0,
+        discountType: "PERCENT",
+        enabled: false,
+        effectiveFrom: "2023-04-11T15:42:33.514",
+        modified: "2023-04-11T15:42:33.000",
+        creationDate: "2023-04-11T15:42:33.517",
+        romanceCopyApproved: true,
+        voucherCodeQuantity: 1,
         localizedDescriptions: [
           {
-            pmmId: "ef785258-febc-11ed-b149-005056a22361",
+            pmmId: "6945cde6-d212-11ed-93c5-005056a24e03",
             locale: "en",
-            shortDescription: "Buy 3, Get One Free*",
-            longDescription:
-              "Men's, Women's & Kids' Socks Buy One, Get One 50% Off. *2nd Item Must Be Of Equal Or Lesser Value. Selection & Availability May Vary By Location. Excludes Nike, Licensed, Icebreaker, Smartwool & Items Ending in .88c. Order must be completed by December 12th, 2019 1:59 AM ET to qualify.",
-          },
-          {
-            pmmId: "ef785258-febc-11ed-b149-005056a22361",
-            locale: "fr",
+            shortDescription: "Test",
+            longDescription: "Testubg",
           },
         ],
-        discountType: "DOLLAR",
-        totalRetailPrice: 50,
-        romanceCopyApproved: false,
-        restrictionRomanceCopyApproved: false,
-        sourceType: "MANUAL",
-        enabled: false,
-        applyType: "AUTO",
-        restrictions: [],
-        spentLimitCheck: false,
-      };
+        invalid: false,
+        code: "51EC82VC1J1MVV02DH",
+        custom: false,
+        quantityRedeemableVouchers: 3,
+        dateTimeGenerated: "2023-04-11T15:42:33.517",
+        serial: false,
+      },
+      version: 1,
+      discountType: "PERCENT",
+      components: [
+        {
+          _id: "657c00aea5c9625c05dc2528",
+          purchaseType: "ACTUAL",
+          quantity: 1,
+          promotionPart: "BUY",
+          rewardDerivationRuleNumber: 1,
+          items: [
+            {
+              _id: "657c00aea5c9625c05dc2529",
+              catalogVersion: "Sport equipment Catalog",
+              code: "10",
+              name: "DPT 10 HOCKEY",
+              url: "",
+              hierarchyLevel: 2,
+              codeField: "code",
+            },
+          ],
+          id: 492764,
+        },
+      ],
+      discountList: [
+        {
+          priceType: 5,
+          priceName: "Permanent",
+          discountAmount: 20,
+        },
+        {
+          priceType: 70,
+          priceName: "Promotional",
+          discountAmount: 40,
+        },
+        {
+          priceType: 1,
+          priceName: "Ticket",
+          discountAmount: 10,
+        },
+        {
+          priceType: 80,
+          priceName: "Doorcrasher",
+          discountAmount: 50,
+        },
+        {
+          priceType: 30,
+          priceName: "Clearance",
+          discountAmount: 30,
+        },
+      ],
+    };
 
+    it("should create a new Multi Promo if one does not already exist", async () => {
       (MultiAmazonPromotion.findOne as jest.Mock).mockResolvedValue(null);
 
       (MultiAmazonPromotion.prototype.save as jest.Mock).mockResolvedValue(
-        mockPromotion,
+        mockSaveMultiPromo,
       );
 
       const response = await request(app)
         .post("/am/v1/promotions/save")
-        .send(mockPromotion);
-      console.log("response.body:", response.body);
+        .send(mockSaveMultiPromo);
+
       expect(response.status).toBe(200);
-      expect(response.body).toEqual(mockPromotion);
+      expect(response.body).toEqual(mockSaveMultiPromo);
     });
 
-    // Add more tests as needed to cover other cases
+    it("should update an existing Multi Promo if one already exists", async () => {
+      let mockSaveMultiPromoDoc = {
+        ...mockSaveMultiPromo,
+        set: jest.fn(),
+        validateSync: jest.fn(),
+        save: jest.fn(),
+      };
+
+      mockSaveMultiPromoDoc.save = jest
+        .fn()
+        .mockResolvedValue(mockSaveMultiPromoDoc);
+
+      (MultiAmazonPromotion.findOne as jest.Mock).mockResolvedValue(
+        mockSaveMultiPromoDoc,
+      );
+
+      (MultiAmazonPromotion.prototype.save as jest.Mock).mockResolvedValue(
+        mockSaveMultiPromoDoc,
+      );
+
+      const response = await request(app)
+        .post("/am/v1/promotions/save")
+        .send(mockSaveMultiPromo);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({
+        ...mockSaveMultiPromo,
+        components: [],
+        zones: [
+          expect.objectContaining({
+            effectiveFrom: "2023-05-27T08:38:11.000",
+            effectiveTo: "2099-01-01T00:00:00.000",
+          }),
+        ],
+      });
+    });
+
+    it("should create a new Price Based Promo if one does not already exist", async () => {
+      (PriceBasedAmazonPromotion.findOne as jest.Mock).mockResolvedValue(null);
+
+      (PriceBasedAmazonPromotion.prototype.save as jest.Mock).mockResolvedValue(
+        mockPriceBasedPromo,
+      );
+
+      const response = await request(app)
+        .post("/am/v1/promotions/save")
+        .send(mockPriceBasedPromo);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(mockPriceBasedPromo);
+    });
+
+    it("should update an existing Price Based Promo if one already exists", async () => {
+      let mockPriceBasePromoDoc = {
+        ...mockPriceBasedPromo,
+        set: jest.fn(),
+        validateSync: jest.fn(),
+        save: jest.fn(),
+      };
+
+      mockPriceBasePromoDoc.save = jest
+        .fn()
+        .mockResolvedValue(mockPriceBasePromoDoc);
+
+      (MultiAmazonPromotion.findOne as jest.Mock).mockResolvedValue(
+        mockPriceBasePromoDoc,
+      );
+
+      (MultiAmazonPromotion.prototype.save as jest.Mock).mockResolvedValue(
+        mockPriceBasePromoDoc,
+      );
+
+      const response = await request(app)
+        .post("/am/v1/promotions/save")
+        .send(mockPriceBasedPromo);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({
+        ...mockPriceBasedPromo,
+        zones: [
+          expect.objectContaining({
+            effectiveTo: "2098-12-31T20:00:00.000Z",
+          }),
+        ],
+      });
+    });
+
+    it("should handle errors", async () => {
+      const response = await request(app)
+        .post("/am/v1/promotions/save")
+        .send({});
+
+      expect(response.status).toBe(500);
+      expect(response.body).toEqual({
+        data: null,
+        error: { message: "Error saving promotion: Invalid promotion type" },
+      });
+    });
   });
 });

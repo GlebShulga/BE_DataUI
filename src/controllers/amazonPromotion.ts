@@ -146,12 +146,13 @@ export async function amazonSavePromo(req: Request, res: Response) {
         throw new Error("Invalid promotion type");
     }
 
-    const effectiveTo =
-      savedPromo.effectiveTo ?? promotion.zones[0]?.effectiveTo;
+    if (!Array.isArray(promotion.zones)) {
+      promotion.zones = [];
+    }
 
     promotion.zones[0] = {
       effectiveFrom: savedPromo.effectiveFrom,
-      effectiveTo,
+      effectiveTo: savedPromo.effectiveTo ?? savedPromo.zones[0]?.effectiveTo,
       modified: new Date(),
     };
 
@@ -167,8 +168,14 @@ export async function amazonSavePromo(req: Request, res: Response) {
     if (savedPromo.buyComponent && savedPromo.buyComponent.items) {
       const newItems = savedPromo.buyComponent.items;
       const itemIds = newItems.map((item: AmazonPromotionItem) => item.item);
+      promotion.components = promotion.components ?? [];
+
       for (const component of promotion.components) {
-        const existingItemIds = component.items.map((item) => item.styleCode);
+        const existingItemIds = component.items.map((item) =>
+          item.hierarchyLevel === hierarchyItemLevelByType.PRODUCT
+            ? item.styleCode
+            : item.code,
+        );
 
         component.items = component.items.filter((item) =>
           itemIds.includes(
