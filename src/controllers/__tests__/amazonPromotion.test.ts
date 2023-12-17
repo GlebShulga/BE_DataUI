@@ -6,6 +6,11 @@ import {
   MultiAmazonPromotion,
   PriceBasedAmazonPromotion,
 } from "../../models/amazonPromotion";
+import {
+  RESPONSE_CODE_NOT_FOUND,
+  RESPONSE_CODE_OK,
+  RESPONSE_CODE_SERVER_ERROR,
+} from "../../constants/responseCodes";
 
 jest.mock("../../models/amazonPromotion");
 
@@ -32,7 +37,7 @@ describe("amazonPromo", () => {
           type: "type1",
         });
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(RESPONSE_CODE_OK);
       expect(response.body.results).toEqual(mockPromotions);
       expect(response.body.totalCount).toBe(mockPromotions.length);
       expect(response.body.error).toBeNull();
@@ -51,7 +56,7 @@ describe("amazonPromo", () => {
           type: "type1",
         });
 
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(RESPONSE_CODE_SERVER_ERROR);
       expect(response.body.data).toBeNull();
       expect(response.body.error.message).toBe(
         `Error searching promotions: ${mockError.message}`,
@@ -67,7 +72,7 @@ describe("amazonPromo", () => {
 
       const response = await request(app).get("/am/v1/promotions/123");
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(RESPONSE_CODE_OK);
       expect(response.body).toEqual(mockPromotion);
     });
 
@@ -76,7 +81,7 @@ describe("amazonPromo", () => {
 
       const response = await request(app).get("/am/v1/promotions/123");
 
-      expect(response.status).toBe(404);
+      expect(response.status).toBe(RESPONSE_CODE_NOT_FOUND);
       expect(response.body.data).toBeNull();
       expect(response.body.error.message).toBe("No promotion with such ID");
     });
@@ -88,7 +93,7 @@ describe("amazonPromo", () => {
 
       const response = await request(app).get("/am/v1/promotions/123");
 
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(RESPONSE_CODE_SERVER_ERROR);
       expect(response.body.results).toBeNull();
       expect(response.body.error.message).toBe(
         `Error fetching promotion: ${mockError.message}`,
@@ -273,7 +278,7 @@ describe("amazonPromo", () => {
         .post("/am/v1/promotions/save")
         .send(mockSaveMultiPromo);
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(RESPONSE_CODE_OK);
       expect(response.body).toEqual(mockSaveMultiPromo);
     });
 
@@ -301,7 +306,7 @@ describe("amazonPromo", () => {
         .post("/am/v1/promotions/save")
         .send(mockSaveMultiPromo);
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(RESPONSE_CODE_OK);
       expect(response.body).toEqual({
         ...mockSaveMultiPromo,
         components: [],
@@ -325,7 +330,7 @@ describe("amazonPromo", () => {
         .post("/am/v1/promotions/save")
         .send(mockPriceBasedPromo);
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(RESPONSE_CODE_OK);
       expect(response.body).toEqual(mockPriceBasedPromo);
     });
 
@@ -353,7 +358,7 @@ describe("amazonPromo", () => {
         .post("/am/v1/promotions/save")
         .send(mockPriceBasedPromo);
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(RESPONSE_CODE_OK);
       expect(response.body).toEqual({
         ...mockPriceBasedPromo,
         zones: [
@@ -369,7 +374,7 @@ describe("amazonPromo", () => {
         .post("/am/v1/promotions/save")
         .send({});
 
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(RESPONSE_CODE_SERVER_ERROR);
       expect(response.body).toEqual({
         data: null,
         error: { message: "Error saving promotion: Invalid promotion type" },

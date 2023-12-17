@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon src/index.ts",
-    "test": "jest",
+    "test": "jest --runInBand",
     "test:coverage": "jest --coverage",
     "pre-commit": "npm run lint",
     "pre-push": "npm run test"
@@ -47,13 +47,6 @@
     "pg": "^8.11.3",
     "uuid": "^9.0.0",
     "winston": "^3.11.0"
-  },
-  "mikro-orm": {
-    "useTsNode": true,
-    "configPaths": [
-      "./src/config/orm.config.ts",
-      "./dist/config/orm.config.js"
-    ]
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [

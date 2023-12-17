@@ -5,6 +5,7 @@ module.exports = {
   silent: false,
   verbose: true,
   collectCoverageFrom: ["src/**"],
+  coverageDirectory: "coverage",
   coverageReporters: ["text"],
   coverageThreshold: {
     global: {

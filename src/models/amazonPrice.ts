@@ -1,6 +1,16 @@
 import mongoose, { Schema } from "mongoose";
 import { AmazonPriceDocument } from "../types/amazonPriceTypes";
-import { localizedDescriptionSchema } from "./amazonVoucher";
+import { LOCALE } from "../types/commonTypes";
+
+const localizedDescriptionSchema = new Schema({
+  locale: {
+    type: String,
+    enum: Object.values(LOCALE),
+    required: true,
+  },
+  shortDescription: String,
+  longDescription: String,
+});
 
 const amazonPriceSchema = new Schema<AmazonPriceDocument>(
   {

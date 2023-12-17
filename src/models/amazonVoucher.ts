@@ -7,7 +7,7 @@ import {
   SerialAmazonVoucherDocument,
 } from "../types/amazonVoucherTypes";
 
-export const localizedDescriptionSchema = new Schema({
+const localizedDescriptionSchema = new Schema({
   locale: {
     type: String,
     enum: Object.values(LOCALE),
