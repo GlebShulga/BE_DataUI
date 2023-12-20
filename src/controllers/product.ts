@@ -102,7 +102,6 @@ export async function getCategoryById(code: string) {
 export async function amazonGetProductById(req: Request, res: Response) {
   try {
     const styleCode = req.params.productId;
-    console.log("req.params:", req.params);
     const product = await getProductById(styleCode);
     res.status(RESPONSE_CODE_OK).json(product);
   } catch (error) {

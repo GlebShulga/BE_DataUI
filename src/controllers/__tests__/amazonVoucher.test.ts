@@ -172,7 +172,6 @@ describe("amazonVouchers", () => {
     };
 
     it("should save a promotional voucher", async () => {
-      const mockVoucher = { id: "123", voucherType: "PROMOTIONAL" };
       (PromotionalAmazonVoucher.findOne as jest.Mock).mockResolvedValue(null);
       (PromotionalAmazonVoucher.prototype.save as jest.Mock).mockResolvedValue(
         mockPromotionalVoucher,

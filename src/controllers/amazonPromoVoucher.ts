@@ -9,12 +9,11 @@ export async function amazonSearchPromoVoucherCode(
   req: Request,
   res: Response,
 ) {
-  console.log("check");
   const PAGE_SIZE = 15;
   const { voucherId, searchTerm } = req.body;
   try {
     let query = {};
-    console.log("req.body", req.body);
+
     if (!!searchTerm && voucherId) {
       query = {
         voucherId,
@@ -23,9 +22,9 @@ export async function amazonSearchPromoVoucherCode(
     } else if (voucherId) {
       query = { voucherId };
     }
-    console.log("query:", query);
+
     const voucherCodes = await AmazonPromoVoucherCode.find(query);
-    console.log("voucherCodes:", voucherCodes);
+
     const totalCount = voucherCodes.length;
 
     res.status(RESPONSE_CODE_OK).json({
