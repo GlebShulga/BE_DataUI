@@ -79,7 +79,6 @@ export async function iHerbSavePrice(req: Request, res: Response) {
     if (!price) {
       price = new IHerbPrice(savedPrice);
     } else {
-      // price.set("localizedDescriptions", savedPrice.descriptions);
       price.set(savedPrice);
     }
 

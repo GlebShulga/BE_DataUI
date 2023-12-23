@@ -22,6 +22,7 @@ const basicPromotionSchema: Schema = new Schema<IHerbPromotionDocument>(
     description: String,
     components: [
       {
+        _id: false,
         purchaseType: String,
         quantity: Number,
         spendAmount: Number,

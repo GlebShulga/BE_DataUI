@@ -21,6 +21,8 @@ describe("amazonPromo", () => {
   });
 
   describe("amazonSearchPromo", () => {
+    const mockPromotionType = "type1";
+
     it("should return promotions and total count", async () => {
       const mockPromotions = [
         { promotionType: "type1" },
@@ -34,7 +36,7 @@ describe("amazonPromo", () => {
         .send({
           predicates: [],
           predicateRelation: "AND",
-          type: "type1",
+          type: mockPromotionType,
         });
 
       expect(response.status).toBe(RESPONSE_CODE_OK);
@@ -53,7 +55,7 @@ describe("amazonPromo", () => {
         .send({
           predicates: [],
           predicateRelation: "AND",
-          type: "type1",
+          type: mockPromotionType,
         });
 
       expect(response.status).toBe(RESPONSE_CODE_SERVER_ERROR);

@@ -14,31 +14,6 @@ import { createSearchFields } from "./helpers/createSearchFields";
 import { PredicateRelation } from "../types/commonTypes";
 import { createQuery } from "./helpers/createQuery";
 
-export async function getPromo(req: Request, res: Response) {
-  try {
-    const promotions = await IHerbPromotion.find(
-      {},
-      { pmmId: 1, name: 1, description: 1, price: 1 },
-    );
-
-    const totalCount = promotions.length;
-
-    res.status(RESPONSE_CODE_OK).json({
-      data: promotions,
-      totalCount,
-      error: null,
-    });
-  } catch (error) {
-    const errorMessage =
-      "Error fetching promotions: " +
-      (error instanceof Error ? error.message : "Unknown error");
-    res.status(RESPONSE_CODE_SERVER_ERROR).json({
-      data: null,
-      error: { message: errorMessage },
-    });
-  }
-}
-
 export async function iHerbGetPromoById(req: Request, res: Response) {
   try {
     const pmmId = req.params.promotionId;
