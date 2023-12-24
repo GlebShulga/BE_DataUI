@@ -16,13 +16,13 @@ These instructions will get you a copy of the project up and running on your loc
 1. Clone the repository
 
 ```bash
-git clone https://github.com/GlebShulga/NodeJS.git
+git clone https://github.com/GlebShulga/BE_DataUI.git
 ```
 
 2. Install dependencies
 
 ```bash
-cd NodeJS
+cd BE_DataUI
 npm install
 ```
 
