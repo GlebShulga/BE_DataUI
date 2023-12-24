@@ -16,13 +16,13 @@ These instructions will get you a copy of the project up and running on your loc
 1. Clone the repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/GlebShulga/NodeJS.git
 ```
 
 2. Install dependencies
 
 ```bash
-cd <project-directory>
+cd NodeJS
 npm install
 ```
 
