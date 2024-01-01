@@ -18,10 +18,10 @@ COPY . .
 USER node
 
 # Expose the port that the application runs on
-EXPOSE 3000
+EXPOSE 8000
 
 # Define a health check
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 CMD curl --fail http://localhost:3000/health || exit 1
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 CMD curl --fail http://localhost:8000/health || exit 1
 
 # Start the application
 CMD [ "npm", "start" ]
