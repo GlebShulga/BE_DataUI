@@ -1,5 +1,4 @@
 import { Request } from "express";
-import { EntityManager } from "@mikro-orm/core";
 import { ObjectId } from "mongoose";
 
 export interface IUser {
@@ -47,8 +46,4 @@ export interface IOrder {
   comments?: string;
   status: string;
   totalPrice: number;
-}
-
-export interface CustomRequest extends Request {
-  orm: EntityManager;
 }
