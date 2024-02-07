@@ -8,7 +8,6 @@ import morgan from "morgan";
 import debug from "debug";
 import { authenticateUser, CurrentUser } from "./auth";
 import { userLogin, userRegistration } from "./controllers/user";
-import logger from "./logs/logger";
 import {
   RESPONSE_CODE_OK,
   RESPONSE_CODE_SERVER_ERROR,
@@ -124,16 +123,6 @@ async function main() {
   };
 
   mongoose.connect(uri, options);
-
-  app.use(
-    morgan("combined", {
-      stream: {
-        write: (message) => {
-          logger.info(message.trim());
-        },
-      },
-    }),
-  );
 
   app.use(bodyParser.json());
 
