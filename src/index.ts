@@ -1,3 +1,4 @@
+var cors = require("cors");
 import * as dotenv from "dotenv";
 import express from "express";
 import net from "net";
@@ -43,6 +44,14 @@ declare global {
 
 dotenv.config();
 export const app = express();
+
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  }),
+);
+
 const port = process.env.PORT || 8000;
 export const server = app.listen(port);
 
