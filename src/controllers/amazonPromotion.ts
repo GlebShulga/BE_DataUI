@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { v4 as uuidv4 } from "uuid";
 import {
   RESPONSE_CODE_NOT_FOUND,
   RESPONSE_CODE_OK,
@@ -86,7 +87,7 @@ export async function amazonSearchPromo(req: Request, res: Response) {
 export async function amazonSavePromo(req: Request, res: Response) {
   try {
     const savedPromo = req.body;
-    const pmmId = savedPromo.pmmId;
+    const { pmmId } = savedPromo;
 
     let promotion;
     let originalEnabled;
@@ -95,6 +96,7 @@ export async function amazonSavePromo(req: Request, res: Response) {
       case "AM_MULTI":
         promotion = await MultiAmazonPromotion.findOne({ pmmId });
         if (!promotion) {
+          savedPromo.pmmId = uuidv4();
           promotion = new MultiAmazonPromotion(savedPromo);
         } else {
           originalEnabled = promotion.enabled;
@@ -104,6 +106,7 @@ export async function amazonSavePromo(req: Request, res: Response) {
       case "AM_PRICE_BASED":
         promotion = await PriceBasedAmazonPromotion.findOne({ pmmId });
         if (!promotion) {
+          savedPromo.pmmId = uuidv4();
           promotion = new PriceBasedAmazonPromotion(savedPromo);
         } else {
           originalEnabled = promotion.enabled;
@@ -112,6 +115,7 @@ export async function amazonSavePromo(req: Request, res: Response) {
       case "AM_FIXED_DISCOUNT":
         promotion = await FixedDiscountAmazonPromotion.findOne({ pmmId });
         if (!promotion) {
+          savedPromo.pmmId = uuidv4();
           promotion = new FixedDiscountAmazonPromotion(savedPromo);
         } else {
           originalEnabled = promotion.enabled;
@@ -120,6 +124,7 @@ export async function amazonSavePromo(req: Request, res: Response) {
       case "AM_FREE_SHIPPING":
         promotion = await ShippingAmazonPromotion.findOne({ pmmId });
         if (!promotion) {
+          savedPromo.pmmId = uuidv4();
           promotion = new ShippingAmazonPromotion(savedPromo);
         } else {
           originalEnabled = promotion.enabled;
@@ -128,6 +133,7 @@ export async function amazonSavePromo(req: Request, res: Response) {
       case "AM_XFORY":
         promotion = await XForYAmazonPromotion.findOne({ pmmId });
         if (!promotion) {
+          savedPromo.pmmId = uuidv4();
           promotion = new XForYAmazonPromotion(savedPromo);
         } else {
           originalEnabled = promotion.enabled;
@@ -136,6 +142,7 @@ export async function amazonSavePromo(req: Request, res: Response) {
       case "AM_SPEND_AND_GET_GC":
         promotion = await SpendAndGetAmazonPromotion.findOne({ pmmId });
         if (!promotion) {
+          savedPromo.pmmId = uuidv4();
           promotion = new SpendAndGetAmazonPromotion(savedPromo);
         } else {
           originalEnabled = promotion.enabled;

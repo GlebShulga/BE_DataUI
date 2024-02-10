@@ -29,7 +29,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.userLogin = exports.userRegistration = void 0;
 const jwt = __importStar(require("jsonwebtoken"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const logger_1 = __importDefault(require("../logs/logger"));
 const models_1 = require("../models");
 const responseCodes_1 = require("../constants/responseCodes");
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -57,11 +56,9 @@ async function userRegistration(req, res) {
             password: encryptedPassword,
             role: isAdmin === "true" ? "admin" : "user",
         });
-        logger_1.default.info(`User ${email} successfully registered`);
         res.status(responseCodes_1.RESPONSE_CODE_CREATED).send("User successfully registered");
     }
     catch (err) {
-        logger_1.default.error("Internal Server Error");
         res.status(responseCodes_1.RESPONSE_CODE_SERVER_ERROR).send("Internal Server Error");
     }
 }
@@ -82,7 +79,6 @@ async function userLogin(req, res) {
             const token = jwt.sign({ userId: user._id, email, role: user.role }, process.env.TOKEN_KEY, {
                 expiresIn: "2h",
             });
-            logger_1.default.info(`User ${email} successfully logged in`);
             return res.status(responseCodes_1.RESPONSE_CODE_OK).json({
                 token,
             });
@@ -90,7 +86,6 @@ async function userLogin(req, res) {
         res.status(responseCodes_1.RESPONSE_CODE_BAD_REQUEST).send("Invalid Credentials");
     }
     catch (err) {
-        logger_1.default.error("Internal Server Error");
         res.status(responseCodes_1.RESPONSE_CODE_SERVER_ERROR).send("Internal Server Error");
     }
 }

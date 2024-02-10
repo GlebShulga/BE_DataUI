@@ -4,7 +4,6 @@ import express from "express";
 import net from "net";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
-import morgan from "morgan";
 import debug from "debug";
 import { authenticateUser, CurrentUser } from "./auth";
 import { userLogin, userRegistration } from "./controllers/user";

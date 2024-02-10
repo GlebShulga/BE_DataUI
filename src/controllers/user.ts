@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import logger from "../logs/logger";
 import { User } from "../models";
 import {
   RESPONSE_CODE_BAD_REQUEST,
@@ -13,15 +12,12 @@ import mongoose from "mongoose";
 
 export async function userRegistration(req: Request, res: Response) {
   try {
-    // Get user input
     const { firstName, lastName, isAdmin, email, password } = req.body;
 
-    // Validate user input
     if (!(email && password && firstName && lastName)) {
       res.status(RESPONSE_CODE_BAD_REQUEST).send("All input is required");
     }
 
-    // Validate if user already exist in our database
     const oldUser = await User.findOne({ email });
 
     if (oldUser) {
@@ -41,11 +37,8 @@ export async function userRegistration(req: Request, res: Response) {
       role: isAdmin === "true" ? "admin" : "user",
     });
 
-    logger.info(`User ${email} successfully registered`);
-
     res.status(RESPONSE_CODE_CREATED).send("User successfully registered");
   } catch (err) {
-    logger.error("Internal Server Error");
     res.status(RESPONSE_CODE_SERVER_ERROR).send("Internal Server Error");
   }
 }
@@ -73,8 +66,6 @@ export async function userLogin(req: Request, res: Response) {
         },
       );
 
-      logger.info(`User ${email} successfully logged in`);
-
       return res.status(RESPONSE_CODE_OK).json({
         token,
       });
@@ -82,7 +73,6 @@ export async function userLogin(req: Request, res: Response) {
 
     res.status(RESPONSE_CODE_BAD_REQUEST).send("Invalid Credentials");
   } catch (err) {
-    logger.error("Internal Server Error");
     res.status(RESPONSE_CODE_SERVER_ERROR).send("Internal Server Error");
   }
 }

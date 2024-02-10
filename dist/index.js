@@ -27,19 +27,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.server = exports.app = void 0;
+var cors = require("cors");
 const dotenv = __importStar(require("dotenv"));
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const mongoose_1 = __importDefault(require("mongoose"));
-const morgan_1 = __importDefault(require("morgan"));
 const debug_1 = __importDefault(require("debug"));
 const auth_1 = require("./auth");
 const user_1 = require("./controllers/user");
-const logger_1 = __importDefault(require("./logs/logger"));
 const responseCodes_1 = require("./constants/responseCodes");
 const controllers_1 = require("./controllers");
 dotenv.config();
 exports.app = (0, express_1.default)();
+exports.app.use(cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+}));
 const port = process.env.PORT || 8000;
 exports.server = exports.app.listen(port);
 const debugLogger = (0, debug_1.default)("node-app");
@@ -90,13 +93,6 @@ async function main() {
         heartbeatFrequencyMS: 1000,
     };
     mongoose_1.default.connect(uri, options);
-    exports.app.use((0, morgan_1.default)("combined", {
-        stream: {
-            write: (message) => {
-                logger_1.default.info(message.trim());
-            },
-        },
-    }));
     exports.app.use(body_parser_1.default.json());
     exports.app.get("/health", async (req, res) => {
         try {

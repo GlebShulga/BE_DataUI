@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.amazonSavePromo = exports.amazonSearchPromo = exports.amazonGetPromoById = void 0;
+const uuid_1 = require("uuid");
 const responseCodes_1 = require("../constants/responseCodes");
 const amazonPromotion_1 = require("../models/amazonPromotion");
 const product_1 = require("./product");
@@ -58,13 +59,16 @@ exports.amazonSearchPromo = amazonSearchPromo;
 async function amazonSavePromo(req, res) {
     try {
         const savedPromo = req.body;
-        const pmmId = savedPromo.pmmId;
+        console.log("savedPromo: ", req.body);
+        const { pmmId } = savedPromo;
         let promotion;
         let originalEnabled;
         switch (savedPromo.promotionType) {
             case "AM_MULTI":
                 promotion = await amazonPromotion_1.MultiAmazonPromotion.findOne({ pmmId });
                 if (!promotion) {
+                    savedPromo.pmmId = (0, uuid_1.v4)();
+                    console.log("AM_MULTI: ", savedPromo);
                     promotion = new amazonPromotion_1.MultiAmazonPromotion(savedPromo);
                 }
                 else {
@@ -75,6 +79,7 @@ async function amazonSavePromo(req, res) {
             case "AM_PRICE_BASED":
                 promotion = await amazonPromotion_1.PriceBasedAmazonPromotion.findOne({ pmmId });
                 if (!promotion) {
+                    savedPromo.pmmId = (0, uuid_1.v4)();
                     promotion = new amazonPromotion_1.PriceBasedAmazonPromotion(savedPromo);
                 }
                 else {
@@ -84,6 +89,7 @@ async function amazonSavePromo(req, res) {
             case "AM_FIXED_DISCOUNT":
                 promotion = await amazonPromotion_1.FixedDiscountAmazonPromotion.findOne({ pmmId });
                 if (!promotion) {
+                    savedPromo.pmmId = (0, uuid_1.v4)();
                     promotion = new amazonPromotion_1.FixedDiscountAmazonPromotion(savedPromo);
                 }
                 else {
@@ -93,6 +99,7 @@ async function amazonSavePromo(req, res) {
             case "AM_FREE_SHIPPING":
                 promotion = await amazonPromotion_1.ShippingAmazonPromotion.findOne({ pmmId });
                 if (!promotion) {
+                    savedPromo.pmmId = (0, uuid_1.v4)();
                     promotion = new amazonPromotion_1.ShippingAmazonPromotion(savedPromo);
                 }
                 else {
@@ -102,6 +109,7 @@ async function amazonSavePromo(req, res) {
             case "AM_XFORY":
                 promotion = await amazonPromotion_1.XForYAmazonPromotion.findOne({ pmmId });
                 if (!promotion) {
+                    savedPromo.pmmId = (0, uuid_1.v4)();
                     promotion = new amazonPromotion_1.XForYAmazonPromotion(savedPromo);
                 }
                 else {
@@ -111,6 +119,7 @@ async function amazonSavePromo(req, res) {
             case "AM_SPEND_AND_GET_GC":
                 promotion = await amazonPromotion_1.SpendAndGetAmazonPromotion.findOne({ pmmId });
                 if (!promotion) {
+                    savedPromo.pmmId = (0, uuid_1.v4)();
                     promotion = new amazonPromotion_1.SpendAndGetAmazonPromotion(savedPromo);
                 }
                 else {
