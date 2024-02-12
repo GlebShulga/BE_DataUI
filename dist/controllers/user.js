@@ -34,13 +34,10 @@ const responseCodes_1 = require("../constants/responseCodes");
 const mongoose_1 = __importDefault(require("mongoose"));
 async function userRegistration(req, res) {
     try {
-        // Get user input
         const { firstName, lastName, isAdmin, email, password } = req.body;
-        // Validate user input
         if (!(email && password && firstName && lastName)) {
             res.status(responseCodes_1.RESPONSE_CODE_BAD_REQUEST).send("All input is required");
         }
-        // Validate if user already exist in our database
         const oldUser = await models_1.User.findOne({ email });
         if (oldUser) {
             return res

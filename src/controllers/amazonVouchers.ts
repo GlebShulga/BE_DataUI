@@ -5,6 +5,12 @@ import {
   RESPONSE_CODE_SERVER_ERROR,
 } from "../constants/responseCodes";
 import {
+  ERROR_FETCH_VOUCHER,
+  ERROR_FIND_VOUCHER,
+  ERROR_SEARCH_VOUCHER,
+  UNKNOWN_ERROR,
+} from "../constants/responses";
+import {
   AmazonVoucher,
   CustomAmazonVoucher,
   PromotionalAmazonVoucher,
@@ -41,8 +47,8 @@ export async function amazonSearchVoucher(req: Request, res: Response) {
     });
   } catch (error) {
     const errorMessage =
-      "Error searching vouchers: " +
-      (error instanceof Error ? error.message : "Unknown error");
+      ERROR_SEARCH_VOUCHER +
+      (error instanceof Error ? error.message : UNKNOWN_ERROR);
     res.status(RESPONSE_CODE_SERVER_ERROR).json({
       data: null,
       error: { message: errorMessage },
@@ -59,15 +65,15 @@ export async function amazonGetVoucherById(req: Request, res: Response) {
     if (!voucher) {
       return res.status(RESPONSE_CODE_NOT_FOUND).json({
         data: null,
-        error: { message: "No voucher with such ID" },
+        error: { message: ERROR_FIND_VOUCHER },
       });
     }
 
     res.status(RESPONSE_CODE_OK).json(voucher);
   } catch (error) {
     const errorMessage =
-      "Error fetching voucher: " +
-      (error instanceof Error ? error.message : "Unknown error");
+      ERROR_FETCH_VOUCHER +
+      (error instanceof Error ? error.message : UNKNOWN_ERROR);
     res.status(RESPONSE_CODE_SERVER_ERROR).json({
       results: null,
       error: { message: errorMessage },
@@ -123,7 +129,7 @@ export async function amazonSaveVoucher(req: Request, res: Response) {
   } catch (error) {
     const errorMessage =
       "Error saving voucher: " +
-      (error instanceof Error ? error.message : "Unknown error");
+      (error instanceof Error ? error.message : UNKNOWN_ERROR);
     res.status(RESPONSE_CODE_SERVER_ERROR).json({
       data: null,
       error: { message: errorMessage },

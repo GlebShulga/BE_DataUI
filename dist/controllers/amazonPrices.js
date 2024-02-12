@@ -6,6 +6,7 @@ const responseCodes_1 = require("../constants/responseCodes");
 const commonTypes_1 = require("../types/commonTypes");
 const createSearchFields_1 = require("./helpers/createSearchFields");
 const createQuery_1 = require("./helpers/createQuery");
+const responses_1 = require("../constants/responses");
 async function amazonSearchPrices(req, res) {
     const { predicates, predicateRelation } = req.body;
     const queryOperator = predicateRelation === commonTypes_1.PredicateRelation.AND ? "$and" : "$or";
@@ -21,8 +22,8 @@ async function amazonSearchPrices(req, res) {
         });
     }
     catch (error) {
-        const errorMessage = "Error searching price: " +
-            (error instanceof Error ? error.message : "Unknown error");
+        const errorMessage = responses_1.ERROR_SEARCH_PRICE +
+            (error instanceof Error ? error.message : responses_1.UNKNOWN_ERROR);
         res.status(responseCodes_1.RESPONSE_CODE_SERVER_ERROR).json({
             data: null,
             error: { message: errorMessage },
@@ -37,14 +38,14 @@ async function amazonGetPriceById(req, res) {
         if (!price) {
             return res.status(responseCodes_1.RESPONSE_CODE_NOT_FOUND).json({
                 data: null,
-                error: { message: "No price with such ID" },
+                error: { message: responses_1.ERROR_FIND_PRICE },
             });
         }
         res.status(responseCodes_1.RESPONSE_CODE_OK).json(price);
     }
     catch (error) {
-        const errorMessage = "Error fetching price: " +
-            (error instanceof Error ? error.message : "Unknown error");
+        const errorMessage = responses_1.ERROR_FETCH_PRICE +
+            (error instanceof Error ? error.message : responses_1.UNKNOWN_ERROR);
         res.status(responseCodes_1.RESPONSE_CODE_SERVER_ERROR).json({
             results: null,
             error: { message: errorMessage },
@@ -73,8 +74,8 @@ async function amazonSavePrice(req, res) {
         res.status(responseCodes_1.RESPONSE_CODE_OK).json(updatedPromo);
     }
     catch (error) {
-        const errorMessage = "Error saving price: " +
-            (error instanceof Error ? error.message : "Unknown error");
+        const errorMessage = responses_1.ERROR_SAVE_PRICE +
+            (error instanceof Error ? error.message : responses_1.UNKNOWN_ERROR);
         res.status(responseCodes_1.RESPONSE_CODE_SERVER_ERROR).json({
             data: null,
             error: { message: errorMessage },

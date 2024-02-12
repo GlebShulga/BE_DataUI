@@ -4,6 +4,7 @@ import {
   RESPONSE_CODE_OK,
   RESPONSE_CODE_SERVER_ERROR,
 } from "../constants/responseCodes";
+import { UNKNOWN_ERROR } from "../constants/responses";
 
 export async function amazonSearchPromoVoucherCode(
   req: Request,
@@ -36,7 +37,7 @@ export async function amazonSearchPromoVoucherCode(
   } catch (error) {
     const errorMessage =
       "Error searching voucher code: " +
-      (error instanceof Error ? error.message : "Unknown error");
+      (error instanceof Error ? error.message : UNKNOWN_ERROR);
     res.status(RESPONSE_CODE_SERVER_ERROR).json({
       data: null,
       error: { message: errorMessage },

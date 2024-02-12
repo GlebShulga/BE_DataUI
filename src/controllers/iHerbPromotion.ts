@@ -5,14 +5,25 @@ import {
   RESPONSE_CODE_SERVER_ERROR,
 } from "../constants/responseCodes";
 import {
+  ERROR_FETCH_PROMO,
+  ERROR_FIND_PROMO,
+  ERROR_SEARCH_PROMO,
+  ERROR_SAVE_PROMO,
+  ERROR_PROMO_TYPE,
+  UNKNOWN_ERROR,
+} from "../constants/responses";
+import {
   ItemRewardIHerbPromotion,
   IHerbPromotion,
   PriceBasedIHerbPromotion,
   FreeShippingIHerbPromotion,
 } from "../models/iHerbPromotion";
-import { createSearchFields } from "./helpers/createSearchFields";
 import { PredicateRelation } from "../types/commonTypes";
-import { createQuery } from "./helpers/createQuery";
+import {
+  createSearchFields,
+  createQuery,
+  createOrUpdatePromotion,
+} from "./helpers";
 
 export async function iHerbGetPromoById(req: Request, res: Response) {
   try {
@@ -22,15 +33,15 @@ export async function iHerbGetPromoById(req: Request, res: Response) {
     if (!promo) {
       return res.status(RESPONSE_CODE_NOT_FOUND).json({
         data: null,
-        error: { message: "No promotion with such ID" },
+        error: { message: ERROR_FIND_PROMO },
       });
     }
 
     res.status(RESPONSE_CODE_OK).json(promo);
   } catch (error) {
     const errorMessage =
-      "Error fetching promotion: " +
-      (error instanceof Error ? error.message : "Unknown error");
+      ERROR_FETCH_PROMO +
+      (error instanceof Error ? error.message : UNKNOWN_ERROR);
     res.status(RESPONSE_CODE_SERVER_ERROR).json({
       results: null,
       error: { message: errorMessage },
@@ -64,8 +75,8 @@ export async function iHerbSearchPromo(req: Request, res: Response) {
     });
   } catch (error) {
     const errorMessage =
-      "Error searching promotions: " +
-      (error instanceof Error ? error.message : "Unknown error");
+      ERROR_SEARCH_PROMO +
+      (error instanceof Error ? error.message : UNKNOWN_ERROR);
     res.status(RESPONSE_CODE_SERVER_ERROR).json({
       data: null,
       error: { message: errorMessage },
@@ -76,40 +87,34 @@ export async function iHerbSearchPromo(req: Request, res: Response) {
 export async function iHerbSavePromo(req: Request, res: Response) {
   try {
     const savedPromo = req.body;
-    const pmmId = savedPromo.pmmId;
+    const { pmmId } = savedPromo;
 
     let promotion;
 
     switch (savedPromo.promotionType) {
       case "ITEM_REWARD":
-        promotion = await ItemRewardIHerbPromotion.findOne({ pmmId });
-
-        if (!promotion) {
-          promotion = new ItemRewardIHerbPromotion(savedPromo);
-        } else {
-          promotion.set(savedPromo);
-        }
+        ({ promotion } = await createOrUpdatePromotion(
+          ItemRewardIHerbPromotion,
+          savedPromo,
+          pmmId,
+        ));
         break;
       case "PRICE_BASED":
-        promotion = await PriceBasedIHerbPromotion.findOne({ pmmId });
-
-        if (!promotion) {
-          promotion = new PriceBasedIHerbPromotion(savedPromo);
-        } else {
-          promotion.set(savedPromo);
-        }
+        ({ promotion } = await createOrUpdatePromotion(
+          PriceBasedIHerbPromotion,
+          savedPromo,
+          pmmId,
+        ));
         break;
       case "FREE_SHIPPING":
-        promotion = await FreeShippingIHerbPromotion.findOne({ pmmId });
-
-        if (!promotion) {
-          promotion = new FreeShippingIHerbPromotion(savedPromo);
-        } else {
-          promotion.set(savedPromo);
-        }
+        ({ promotion } = await createOrUpdatePromotion(
+          FreeShippingIHerbPromotion,
+          savedPromo,
+          pmmId,
+        ));
         break;
       default:
-        throw new Error("Invalid promotion type");
+        throw new Error(ERROR_PROMO_TYPE);
     }
 
     const validationError = promotion.validateSync();
@@ -123,8 +128,8 @@ export async function iHerbSavePromo(req: Request, res: Response) {
     res.status(RESPONSE_CODE_OK).json(updatedPromo);
   } catch (error) {
     const errorMessage =
-      "Error saving promotion: " +
-      (error instanceof Error ? error.message : "Unknown error");
+      ERROR_SAVE_PROMO +
+      (error instanceof Error ? error.message : UNKNOWN_ERROR);
     res.status(RESPONSE_CODE_SERVER_ERROR).json({
       data: null,
       error: { message: errorMessage },

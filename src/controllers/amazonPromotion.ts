@@ -1,10 +1,18 @@
 import { Request, Response } from "express";
-import { v4 as uuidv4 } from "uuid";
 import {
   RESPONSE_CODE_NOT_FOUND,
   RESPONSE_CODE_OK,
   RESPONSE_CODE_SERVER_ERROR,
 } from "../constants/responseCodes";
+import {
+  ERROR_FETCH_PROMO,
+  ERROR_FIND_PROMO,
+  ERROR_PROMO_TYPE,
+  ERROR_SAVE_PROMO,
+  ERROR_SEARCH_PROMO,
+  UNKNOWN_ERROR,
+} from "../constants/responses";
+import { Product } from "../models/productCategory";
 import {
   AmazonPromotion,
   FixedDiscountAmazonPromotion,
@@ -20,10 +28,12 @@ import {
   ProductCategory,
   hierarchyItemLevelByType,
 } from "../types/productCategory";
-import { Product } from "../models";
 import { PredicateRelation } from "../types/commonTypes";
-import { createSearchFields } from "./helpers/createSearchFields";
-import { createQuery } from "./helpers/createQuery";
+import {
+  createSearchFields,
+  createQuery,
+  createOrUpdatePromotion,
+} from "./helpers";
 
 export async function amazonGetPromoById(req: Request, res: Response) {
   try {
@@ -33,15 +43,15 @@ export async function amazonGetPromoById(req: Request, res: Response) {
     if (!promo) {
       return res.status(RESPONSE_CODE_NOT_FOUND).json({
         data: null,
-        error: { message: "No promotion with such ID" },
+        error: { message: ERROR_FIND_PROMO },
       });
     }
 
     res.status(RESPONSE_CODE_OK).json(promo);
   } catch (error) {
     const errorMessage =
-      "Error fetching promotion: " +
-      (error instanceof Error ? error.message : "Unknown error");
+      ERROR_FETCH_PROMO +
+      (error instanceof Error ? error.message : UNKNOWN_ERROR);
     res.status(RESPONSE_CODE_SERVER_ERROR).json({
       results: null,
       error: { message: errorMessage },
@@ -75,8 +85,8 @@ export async function amazonSearchPromo(req: Request, res: Response) {
     });
   } catch (error) {
     const errorMessage =
-      "Error searching promotions: " +
-      (error instanceof Error ? error.message : "Unknown error");
+      ERROR_SEARCH_PROMO +
+      (error instanceof Error ? error.message : UNKNOWN_ERROR);
     res.status(RESPONSE_CODE_SERVER_ERROR).json({
       data: null,
       error: { message: errorMessage },
@@ -94,63 +104,49 @@ export async function amazonSavePromo(req: Request, res: Response) {
 
     switch (savedPromo.promotionType) {
       case "AM_MULTI":
-        promotion = await MultiAmazonPromotion.findOne({ pmmId });
-        if (!promotion) {
-          savedPromo.pmmId = uuidv4();
-          promotion = new MultiAmazonPromotion(savedPromo);
-        } else {
-          originalEnabled = promotion.enabled;
-          promotion.set(savedPromo);
-        }
+        ({ promotion, originalEnabled } = await createOrUpdatePromotion(
+          MultiAmazonPromotion,
+          savedPromo,
+          pmmId,
+        ));
         break;
       case "AM_PRICE_BASED":
-        promotion = await PriceBasedAmazonPromotion.findOne({ pmmId });
-        if (!promotion) {
-          savedPromo.pmmId = uuidv4();
-          promotion = new PriceBasedAmazonPromotion(savedPromo);
-        } else {
-          originalEnabled = promotion.enabled;
-          promotion.set(savedPromo);
-        }
+        ({ promotion, originalEnabled } = await createOrUpdatePromotion(
+          PriceBasedAmazonPromotion,
+          savedPromo,
+          pmmId,
+        ));
+        break;
       case "AM_FIXED_DISCOUNT":
-        promotion = await FixedDiscountAmazonPromotion.findOne({ pmmId });
-        if (!promotion) {
-          savedPromo.pmmId = uuidv4();
-          promotion = new FixedDiscountAmazonPromotion(savedPromo);
-        } else {
-          originalEnabled = promotion.enabled;
-          promotion.set(savedPromo);
-        }
+        ({ promotion, originalEnabled } = await createOrUpdatePromotion(
+          FixedDiscountAmazonPromotion,
+          savedPromo,
+          pmmId,
+        ));
+        break;
       case "AM_FREE_SHIPPING":
-        promotion = await ShippingAmazonPromotion.findOne({ pmmId });
-        if (!promotion) {
-          savedPromo.pmmId = uuidv4();
-          promotion = new ShippingAmazonPromotion(savedPromo);
-        } else {
-          originalEnabled = promotion.enabled;
-          promotion.set(savedPromo);
-        }
+        ({ promotion, originalEnabled } = await createOrUpdatePromotion(
+          ShippingAmazonPromotion,
+          savedPromo,
+          pmmId,
+        ));
+        break;
       case "AM_XFORY":
-        promotion = await XForYAmazonPromotion.findOne({ pmmId });
-        if (!promotion) {
-          savedPromo.pmmId = uuidv4();
-          promotion = new XForYAmazonPromotion(savedPromo);
-        } else {
-          originalEnabled = promotion.enabled;
-          promotion.set(savedPromo);
-        }
+        ({ promotion, originalEnabled } = await createOrUpdatePromotion(
+          XForYAmazonPromotion,
+          savedPromo,
+          pmmId,
+        ));
+        break;
       case "AM_SPEND_AND_GET_GC":
-        promotion = await SpendAndGetAmazonPromotion.findOne({ pmmId });
-        if (!promotion) {
-          savedPromo.pmmId = uuidv4();
-          promotion = new SpendAndGetAmazonPromotion(savedPromo);
-        } else {
-          originalEnabled = promotion.enabled;
-          promotion.set(savedPromo);
-        }
+        ({ promotion, originalEnabled } = await createOrUpdatePromotion(
+          SpendAndGetAmazonPromotion,
+          savedPromo,
+          pmmId,
+        ));
         break;
       default:
-        throw new Error("Invalid promotion type");
+        throw new Error(ERROR_PROMO_TYPE);
     }
 
     if (!Array.isArray(promotion.zones)) {
@@ -178,13 +174,13 @@ export async function amazonSavePromo(req: Request, res: Response) {
       promotion.components = promotion.components ?? [];
 
       for (const component of promotion.components) {
-        const existingItemIds = component.items.map((item) =>
+        const existingItemIds = component.items.map((item: ProductCategory) =>
           item.hierarchyLevel === hierarchyItemLevelByType.PRODUCT
             ? item.styleCode
             : item.code,
         );
 
-        component.items = component.items.filter((item) =>
+        component.items = component.items.filter((item: ProductCategory) =>
           itemIds.includes(
             item.hierarchyLevel === hierarchyItemLevelByType.PRODUCT
               ? item.styleCode
@@ -231,8 +227,8 @@ export async function amazonSavePromo(req: Request, res: Response) {
     res.status(RESPONSE_CODE_OK).json(updatedPromo);
   } catch (error) {
     const errorMessage =
-      "Error saving promotion: " +
-      (error instanceof Error ? error.message : "Unknown error");
+      ERROR_SAVE_PROMO +
+      (error instanceof Error ? error.message : UNKNOWN_ERROR);
     res.status(RESPONSE_CODE_SERVER_ERROR).json({
       data: null,
       error: { message: errorMessage },

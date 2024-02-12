@@ -5,6 +5,13 @@ import {
   RESPONSE_CODE_OK,
   RESPONSE_CODE_SERVER_ERROR,
 } from "../constants/responseCodes";
+import {
+  ERROR_FETCH_PRICE,
+  ERROR_FIND_PRICE,
+  ERROR_SAVE_PRICE,
+  ERROR_SEARCH_PRICE,
+  UNKNOWN_ERROR,
+} from "../constants/responses";
 import { PredicateRelation } from "../types/commonTypes";
 import { createSearchFields } from "./helpers/createSearchFields";
 import { createQuery } from "./helpers/createQuery";
@@ -34,8 +41,8 @@ export async function iHerbSearchPrices(req: Request, res: Response) {
     });
   } catch (error) {
     const errorMessage =
-      "Error searching price: " +
-      (error instanceof Error ? error.message : "Unknown error");
+      ERROR_SEARCH_PRICE +
+      (error instanceof Error ? error.message : UNKNOWN_ERROR);
     res.status(RESPONSE_CODE_SERVER_ERROR).json({
       data: null,
       error: { message: errorMessage },
@@ -52,15 +59,15 @@ export async function iHerbGetPriceById(req: Request, res: Response) {
     if (!price) {
       return res.status(RESPONSE_CODE_NOT_FOUND).json({
         data: null,
-        error: { message: "No price with such ID" },
+        error: { message: ERROR_FIND_PRICE },
       });
     }
 
     res.status(RESPONSE_CODE_OK).json(price);
   } catch (error) {
     const errorMessage =
-      "Error fetching price: " +
-      (error instanceof Error ? error.message : "Unknown error");
+      ERROR_FETCH_PRICE +
+      (error instanceof Error ? error.message : UNKNOWN_ERROR);
     res.status(RESPONSE_CODE_SERVER_ERROR).json({
       results: null,
       error: { message: errorMessage },
@@ -93,8 +100,8 @@ export async function iHerbSavePrice(req: Request, res: Response) {
     res.status(RESPONSE_CODE_OK).json(updatedPromo);
   } catch (error) {
     const errorMessage =
-      "Error saving price: " +
-      (error instanceof Error ? error.message : "Unknown error");
+      ERROR_SAVE_PRICE +
+      (error instanceof Error ? error.message : UNKNOWN_ERROR);
     res.status(RESPONSE_CODE_SERVER_ERROR).json({
       data: null,
       error: { message: errorMessage },

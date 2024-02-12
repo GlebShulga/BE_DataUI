@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.amazonGetProductById = exports.getCategoryById = exports.getProductById = exports.amazonSearchProductOrCategory = void 0;
 const productCategory_1 = require("../models/productCategory");
 const responseCodes_1 = require("../constants/responseCodes");
+const responses_1 = require("../constants/responses");
 async function amazonSearchProductOrCategory(req, res) {
     const PRODUCT_SEARCH_TYPE = "STYLE_SEARCH";
     const BULK_PRODUCT_SEARCH_TYPE = "STYLE_BULK_SEARCH";
@@ -40,7 +41,7 @@ async function amazonSearchProductOrCategory(req, res) {
             Model = productCategory_1.Category;
         }
         else {
-            throw new Error("Invalid search type");
+            throw new Error(responses_1.ERROR_SEARCH_TYPE);
         }
         const totalResults = await Model.countDocuments(query);
         const totalPages = Math.ceil(totalResults / PAGE_SIZE);
@@ -59,8 +60,8 @@ async function amazonSearchProductOrCategory(req, res) {
         });
     }
     catch (error) {
-        const errorMessage = "Error searching product or category: " +
-            (error instanceof Error ? error.message : "Unknown error");
+        const errorMessage = responses_1.ERROR_SEARCH_PRODUCT_OR_CATEGORY +
+            (error instanceof Error ? error.message : responses_1.UNKNOWN_ERROR);
         res.status(responseCodes_1.RESPONSE_CODE_SERVER_ERROR).json({
             data: null,
             error: { message: errorMessage },
@@ -71,7 +72,7 @@ exports.amazonSearchProductOrCategory = amazonSearchProductOrCategory;
 async function getProductById(styleCode) {
     const product = await productCategory_1.Product.findOne({ styleCode });
     if (!product) {
-        throw new Error("No product with such ID");
+        throw new Error(responses_1.ERROR_FIND_PRODUCT);
     }
     return product;
 }
@@ -79,7 +80,7 @@ exports.getProductById = getProductById;
 async function getCategoryById(code) {
     const product = await productCategory_1.Product.findOne({ code });
     if (!product) {
-        throw new Error("No category with such ID");
+        throw new Error(responses_1.ERROR_FIND_CATEGORY);
     }
     return product;
 }
@@ -91,8 +92,8 @@ async function amazonGetProductById(req, res) {
         res.status(responseCodes_1.RESPONSE_CODE_OK).json(product);
     }
     catch (error) {
-        const errorMessage = "Error fetching product: " +
-            (error instanceof Error ? error.message : "Unknown error");
+        const errorMessage = responses_1.ERROR_FETCH_PRODUCT +
+            (error instanceof Error ? error.message : responses_1.UNKNOWN_ERROR);
         res.status(responseCodes_1.RESPONSE_CODE_SERVER_ERROR).json({
             results: null,
             error: { message: errorMessage },

@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.amazonSearchPromoVoucherCode = void 0;
 const amazonPromoVoucher_1 = require("../models/amazonPromoVoucher");
 const responseCodes_1 = require("../constants/responseCodes");
+const responses_1 = require("../constants/responses");
 async function amazonSearchPromoVoucherCode(req, res) {
     const PAGE_SIZE = 15;
     const { voucherId, searchTerm } = req.body;
@@ -28,7 +29,7 @@ async function amazonSearchPromoVoucherCode(req, res) {
     }
     catch (error) {
         const errorMessage = "Error searching voucher code: " +
-            (error instanceof Error ? error.message : "Unknown error");
+            (error instanceof Error ? error.message : responses_1.UNKNOWN_ERROR);
         res.status(responseCodes_1.RESPONSE_CODE_SERVER_ERROR).json({
             data: null,
             error: { message: errorMessage },

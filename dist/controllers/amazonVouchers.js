@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.amazonSaveVoucher = exports.amazonGetVoucherById = exports.amazonSearchVoucher = void 0;
 const responseCodes_1 = require("../constants/responseCodes");
+const responses_1 = require("../constants/responses");
 const amazonVoucher_1 = require("../models/amazonVoucher");
 const commonTypes_1 = require("../types/commonTypes");
 const createSearchFields_1 = require("./helpers/createSearchFields");
@@ -21,8 +22,8 @@ async function amazonSearchVoucher(req, res) {
         });
     }
     catch (error) {
-        const errorMessage = "Error searching vouchers: " +
-            (error instanceof Error ? error.message : "Unknown error");
+        const errorMessage = responses_1.ERROR_SEARCH_VOUCHER +
+            (error instanceof Error ? error.message : responses_1.UNKNOWN_ERROR);
         res.status(responseCodes_1.RESPONSE_CODE_SERVER_ERROR).json({
             data: null,
             error: { message: errorMessage },
@@ -37,14 +38,14 @@ async function amazonGetVoucherById(req, res) {
         if (!voucher) {
             return res.status(responseCodes_1.RESPONSE_CODE_NOT_FOUND).json({
                 data: null,
-                error: { message: "No voucher with such ID" },
+                error: { message: responses_1.ERROR_FIND_VOUCHER },
             });
         }
         res.status(responseCodes_1.RESPONSE_CODE_OK).json(voucher);
     }
     catch (error) {
-        const errorMessage = "Error fetching voucher: " +
-            (error instanceof Error ? error.message : "Unknown error");
+        const errorMessage = responses_1.ERROR_FETCH_VOUCHER +
+            (error instanceof Error ? error.message : responses_1.UNKNOWN_ERROR);
         res.status(responseCodes_1.RESPONSE_CODE_SERVER_ERROR).json({
             results: null,
             error: { message: errorMessage },
@@ -97,7 +98,7 @@ async function amazonSaveVoucher(req, res) {
     }
     catch (error) {
         const errorMessage = "Error saving voucher: " +
-            (error instanceof Error ? error.message : "Unknown error");
+            (error instanceof Error ? error.message : responses_1.UNKNOWN_ERROR);
         res.status(responseCodes_1.RESPONSE_CODE_SERVER_ERROR).json({
             data: null,
             error: { message: errorMessage },

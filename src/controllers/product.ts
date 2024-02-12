@@ -4,6 +4,14 @@ import {
   RESPONSE_CODE_OK,
   RESPONSE_CODE_SERVER_ERROR,
 } from "../constants/responseCodes";
+import {
+  ERROR_FETCH_PRODUCT,
+  ERROR_FIND_CATEGORY,
+  ERROR_FIND_PRODUCT,
+  ERROR_SEARCH_PRODUCT_OR_CATEGORY,
+  ERROR_SEARCH_TYPE,
+  UNKNOWN_ERROR,
+} from "../constants/responses";
 
 export async function amazonSearchProductOrCategory(
   req: Request,
@@ -50,7 +58,7 @@ export async function amazonSearchProductOrCategory(
     ) {
       Model = Category;
     } else {
-      throw new Error("Invalid search type");
+      throw new Error(ERROR_SEARCH_TYPE);
     }
 
     const totalResults = await Model.countDocuments(query);
@@ -72,8 +80,8 @@ export async function amazonSearchProductOrCategory(
     });
   } catch (error) {
     const errorMessage =
-      "Error searching product or category: " +
-      (error instanceof Error ? error.message : "Unknown error");
+      ERROR_SEARCH_PRODUCT_OR_CATEGORY +
+      (error instanceof Error ? error.message : UNKNOWN_ERROR);
     res.status(RESPONSE_CODE_SERVER_ERROR).json({
       data: null,
       error: { message: errorMessage },
@@ -85,7 +93,7 @@ export async function getProductById(styleCode: string) {
   const product = await Product.findOne({ styleCode });
 
   if (!product) {
-    throw new Error("No product with such ID");
+    throw new Error(ERROR_FIND_PRODUCT);
   }
   return product;
 }
@@ -94,7 +102,7 @@ export async function getCategoryById(code: string) {
   const product = await Product.findOne({ code });
 
   if (!product) {
-    throw new Error("No category with such ID");
+    throw new Error(ERROR_FIND_CATEGORY);
   }
   return product;
 }
@@ -106,8 +114,8 @@ export async function amazonGetProductById(req: Request, res: Response) {
     res.status(RESPONSE_CODE_OK).json(product);
   } catch (error) {
     const errorMessage =
-      "Error fetching product: " +
-      (error instanceof Error ? error.message : "Unknown error");
+      ERROR_FETCH_PRODUCT +
+      (error instanceof Error ? error.message : UNKNOWN_ERROR);
     res.status(RESPONSE_CODE_SERVER_ERROR).json({
       results: null,
       error: { message: errorMessage },
